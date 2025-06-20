@@ -1,0 +1,150 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model Cargo {
+  idCargo  Int        @id @default(autoincrement())
+  cargo    String
+  pagoHora Decimal
+  personal Personal[]
+}
+
+model Personal {
+  dniPersonal String      @id @db.Char(8)
+  nombre      String      @db.VarChar(60)
+  apellido    String      @db.VarChar(60)
+  edad        Int
+  correo      String      @db.VarChar(60)
+  telefono    String      @db.Char(9)
+  cuentaBcp   String      @db.Char(14)
+  idCargo     Int?
+  cargo       Cargo?      @relation(fields: [idCargo], references: [idCargo], onDelete: SetNull)
+  usuario     Usuario?
+  actividad   Actividad[]
+}
+
+model Usuario {
+  usuario     String    @id @db.VarChar(20)
+  clave       String    @db.VarChar(100)
+  dniPersonal String    @unique @db.Char(8)
+  personal    Personal? @relation(fields: [dniPersonal], references: [dniPersonal], onDelete: Cascade)
+}
+
+model Cliente {
+  dniCliente String     @id @db.Char(8)
+  nombre     String     @db.VarChar(60)
+  correo     String     @db.VarChar(60)
+  telefono   String     @db.Char(9)
+  proyecto   Proyecto[]
+}
+
+model Proveedor {
+  rucProveedor String   @id @db.Char(11)
+  razonSocial  String   @db.VarChar(100)
+  cuentaBcp    String   @db.Char(14)
+  Compra       Compra[]
+}
+
+model Compra {
+  codCompra     String         @id @db.Char(10)
+  rucProveedor  String?        @db.Char(11)
+  proveedor     Proveedor?     @relation(fields: [rucProveedor], references: [rucProveedor], onDelete: Cascade)
+  costoTotal    Decimal
+  fechaCompra   DateTime
+  detalleCompra DetalleCompra?
+}
+
+model DetalleCompra {
+  idDetalle   Int     @id @default(autoincrement())
+  codCompra   String  @unique @db.Char(10)
+  compra      Compra? @relation(fields: [codCompra], references: [codCompra], onDelete: Cascade)
+  codigo      String  @db.Char(10)
+  descripcion String  @db.VarChar(255)
+  categoria   String  @db.Char(20)
+  cantidad    Int
+  estado      String  @default("DISPONIBLE") @db.Char(20)
+}
+
+model Maquinaria {
+  codMaquinaria  String           @id @db.Char(10)
+  descripcion    String           @db.VarChar(255)
+  cantidad       Int
+  estado         String           @default("DISPONIBLE") @db.Char(20)
+  detaMaquinaria DetaMaquinaria[]
+  mantenimiento  Mantenimiento[]
+}
+
+model Material {
+  codMaterial  String         @id @db.Char(10)
+  descripcion  String         @db.VarChar(255)
+  cantidad     Int
+  unidadMedida String         @db.Char(20)
+  detaMaterial DetaMaterial[]
+}
+
+model Proyecto {
+  codProyecto   String        @id @db.Char(7)
+  nombre        String        @db.VarChar(255)
+  dniCliente    String        @db.Char(8)
+  cliente       Cliente       @relation(fields: [dniCliente], references: [dniCliente], onDelete: Cascade)
+  fechaInicio   DateTime
+  fechaFin      DateTime
+  estado        String        @default("EN PLANIFICACION") @db.Char(20)
+  costoProyecto Decimal
+  detaProyecto  DetaProyecto?
+  actividad     Actividad[]
+}
+
+model DetaProyecto {
+  idDetaProyecto Int              @id @default(autoincrement())
+  codProyecto    String           @unique @db.Char(7)
+  proyecto       Proyecto?        @relation(fields: [codProyecto], references: [codProyecto], onDelete: Cascade)
+  detaMaterial   DetaMaterial[]
+  detaMaquinaria DetaMaquinaria[]
+}
+
+model DetaMaterial {
+  idDetaMaterial  Int          @id @default(autoincrement())
+  idDetaProyecto  Int
+  detaProyecto    DetaProyecto @relation(fields: [idDetaProyecto], references: [idDetaProyecto], onDelete: Cascade)
+  codMaterial     String       @db.Char(10)
+  material        Material     @relation(fields: [codMaterial], references: [codMaterial], onDelete: Cascade)
+  cantidad        Int
+  cantidadUsada   Int
+  cantidadRestate Int?
+}
+
+model DetaMaquinaria {
+  idDetaMaquinaria Int          @id @default(autoincrement())
+  idDetaProyecto   Int
+  detaProyecto     DetaProyecto @relation(fields: [idDetaProyecto], references: [idDetaProyecto], onDelete: Cascade)
+  codMaquinaria    String       @db.Char(10)
+  maquinaria       Maquinaria   @relation(fields: [codMaquinaria], references: [codMaquinaria], onDelete: Cascade)
+}
+
+model Actividad {
+  idActividad      Int      @id @default(autoincrement())
+  codProyecto      String   @db.Char(7)
+  proyecto         Proyecto @relation(fields: [codProyecto], references: [codProyecto], onDelete: Cascade)
+  dniPersonal      String   @db.Char(8)
+  personal         Personal @relation(fields: [dniPersonal], references: [dniPersonal], onDelete: Cascade)
+  tipoActividad    String   @db.VarChar(50)
+  descripcion      String   @db.VarChar(255)
+  estado           String   @default("NO INICIADO") @db.Char(20)
+  duracionEstimada Int
+  duracionReal     Int?
+}
+
+model Mantenimiento {
+  idMantenimiento Int        @id @default(autoincrement())
+  codMaquinaria   String     @db.Char(10)
+  maquinaria      Maquinaria @relation(fields: [codMaquinaria], references: [codMaquinaria], onDelete: Cascade)
+  fechaInicio     DateTime
+  fechaFin        DateTime?
+  estado          String     @db.Char(20)
+}
