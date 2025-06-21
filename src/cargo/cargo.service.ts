@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Cargo } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CrearCargoInput } from './crear-cargo.input';
+import { ActualizarCargoDto } from './actualizar-cargo.input';
 
 @Injectable()
 export class CargoService {
@@ -82,6 +83,28 @@ export class CargoService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async actualizarCargo(
+    idCargo: number,
+    input: ActualizarCargoDto,
+  ): Promise<Cargo> {
+    const cargoExistente = await this.prisma.cargo.findUnique({
+      where: { idCargo },
+    });
+    if (!cargoExistente) {
+      throw new HttpException(
+        'El cargo no existe en la base de datos',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return this.prisma.cargo.update({
+      where: { idCargo },
+      data: {
+        ...input,
+      },
+    });
   }
 
   
