@@ -1,6 +1,7 @@
-import { Field, Float } from '@nestjs/graphql';
+import { Field, Float, InputType } from '@nestjs/graphql';
 import { IsNumber, IsOptional, Min } from 'class-validator';
 
+@InputType()
 export class ActualizarCargoInput {
   @Field(() => Float)
   @IsOptional()
