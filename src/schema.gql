@@ -1,0 +1,32 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Cargo {
+  idCargo: Int!
+  cargo: String!
+  pagoHora: Float!
+}
+
+type Query {
+  obtenerCargos: [Cargo!]!
+  obtenerConteoCargos: Int!
+  obtenerCargoMejorPagado: String
+  obtenerMontoTotalHora(cargo: String): Float!
+  obtenerCargoPorNombre(cargo: String!): Cargo
+}
+
+type Mutation {
+  crearCargo(data: CrearCargoInput!): Boolean!
+  actualizarCargo(idCargo: Int!, data: ActualizarCargoInput!): Cargo!
+  borrarCargo(cargo: String!): Boolean!
+}
+
+input CrearCargoInput {
+  cargo: String!
+  pagoHora: Float!
+}
+
+input ActualizarCargoInput {
+  pagoHora: Float!
+}
