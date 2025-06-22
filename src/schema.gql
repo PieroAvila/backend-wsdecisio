@@ -11,4 +11,22 @@ type Cargo {
 type Query {
   obtenerCargos: [Cargo!]!
   obtenerConteoCargos: Int!
+  obtenerCargoMejorPagado: String
+  obtenerMontoTotalHora(cargo: String): Float!
+  obtenerCargoPorNombre(cargo: String!): Cargo
+}
+
+type Mutation {
+  crearCargo(data: CrearCargoInput!): Boolean!
+  actualizarCargo(idCargo: Int!, data: ActualizarCargoInput!): Cargo!
+  borrarCargo(cargo: String!): Boolean!
+}
+
+input CrearCargoInput {
+  cargo: String!
+  pagoHora: Float!
+}
+
+input ActualizarCargoInput {
+  pagoHora: Float!
 }
