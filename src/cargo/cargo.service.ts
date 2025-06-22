@@ -107,5 +107,18 @@ export class CargoService {
     });
   }
 
-  
+  async borrarCargo(cargo: string): Promise<void> {
+    const cargos = await this.prisma.cargo.findMany({
+      where: { cargo },
+    });
+    if (cargos.length === 0) {
+      throw new HttpException(
+        `El cargo ${cargo} no existe en la base de datos`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    await this.prisma.cargo.deleteMany({
+      where: { cargo },
+    });
+  }
 }
