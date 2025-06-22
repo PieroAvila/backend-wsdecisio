@@ -1,6 +1,8 @@
-import { Args, Float, Int, Query, Resolver } from "@nestjs/graphql";
+import { Args, Float, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { Cargo } from "./cargo.model";
 import { CargoService } from "./cargo.service";
+import { CrearCargoInput } from "./crear-cargo.input";
+import { ActualizarCargoInput } from "./actualizar-cargo.input";
 
 @Resolver(() => Cargo)
 export class CargoResolver {
@@ -29,5 +31,25 @@ export class CargoResolver {
     @Query(() => Cargo, { nullable: true })
     async obtenerCargoPorNombre(@Args('cargo') cargo: string) {
         return this.cargoService.obtenerCargoPorNombre(cargo);
+    }
+
+    @Mutation(() => Boolean)
+    async crearCargo(@Args('data') data: CrearCargoInput) {
+        await this.cargoService.crearCargo(data);
+        return true;
+    }
+
+    @Mutation(() => Cargo)
+    async actualizarCargo(
+        @Args('idCargo', { type: () => Int }) idCargo: number,
+        @Args('data') data: ActualizarCargoInput,
+    ) {
+        return this.cargoService.actualizarCargo(idCargo, data);
+    }
+
+    @Mutation(() => Boolean)
+    async borrarCargo(@Args('cargo') cargo: string) {
+        await this.cargoService.borrarCargo(cargo);
+        return true;
     }
 }

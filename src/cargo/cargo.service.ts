@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Cargo } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CrearCargoInput } from './crear-cargo.input';
-import { ActualizarCargoDto } from './actualizar-cargo.input';
+import { ActualizarCargoInput } from './actualizar-cargo.input';
 
 @Injectable()
 export class CargoService {
@@ -87,7 +87,7 @@ export class CargoService {
 
   async actualizarCargo(
     idCargo: number,
-    input: ActualizarCargoDto,
+    input: ActualizarCargoInput,
   ): Promise<Cargo> {
     const cargoExistente = await this.prisma.cargo.findUnique({
       where: { idCargo },
