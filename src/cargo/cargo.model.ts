@@ -1,4 +1,5 @@
 import { Field, Float, Int, ObjectType } from "@nestjs/graphql";
+import { Personal } from "src/personal/personal.model";
 
 @ObjectType()
 export class Cargo {
@@ -10,4 +11,7 @@ export class Cargo {
 
     @Field(() => Float)
     pagoHora: number;
+
+    @Field(() => [Personal], { nullable: true })
+  personales?: Personal[];
 }
