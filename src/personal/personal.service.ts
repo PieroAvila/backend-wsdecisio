@@ -53,5 +53,28 @@ export class PersonalService {
         });
     }
 
-    
+    async obtenerMontoTotalPorHora(filtro?: {
+        edad?: number;
+        cargo?: string;
+    }): Promise<number> {
+        const personales = await this.prisma.personal.findMany({
+            where: {
+                ...(filtro?.edad && { edad: filtro.edad }),
+                ...(filtro?.cargo && {
+                    cargo: {
+                        cargo: {
+                            equals: filtro.cargo,
+                        },
+                    },
+                }),
+            },
+            include: {
+                cargo: true,
+            },
+        });
+        const total = personales.reduce(
+            (sum, p) => sum + Number(p.cargo?.pagoHora ?? 0), 0,
+        );
+        return total;
+    }
 }
