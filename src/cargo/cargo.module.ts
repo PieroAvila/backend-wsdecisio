@@ -1,9 +1,9 @@
-import { Module } from "@nestjs/common";
-import { CargoService } from "./cargo.service";
-import { CargoResolver } from "./cargo.resolver";
-import { PrismaService } from "src/prisma/prisma.service";
+import { Module } from '@nestjs/common';
+import { CargoService } from './cargo.service';
+import { CargoResolver } from './cargo.resolver';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Module({
-    providers: [CargoService, CargoResolver, PrismaService],
+  providers: [CargoService, CargoResolver, PrismaService],
 })
 export class CargoModule {}

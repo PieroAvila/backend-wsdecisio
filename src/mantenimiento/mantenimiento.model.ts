@@ -1,5 +1,5 @@
-import { Field, Int, ObjectType } from "@nestjs/graphql";
-import { Maquinaria } from "src/maquinaria/maquinaria.model";
+import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Maquinaria } from 'src/maquinaria/maquinaria.model';
 
 @ObjectType()
 export class Mantenimiento {

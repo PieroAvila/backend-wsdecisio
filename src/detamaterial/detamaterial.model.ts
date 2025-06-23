@@ -1,6 +1,6 @@
-import { Field, Int, ObjectType } from "@nestjs/graphql";
-import { DetaProyecto } from "src/detaproyecto/detaproyecto.model";
-import { Material } from "src/material/material.model";
+import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { DetaProyecto } from 'src/detaproyecto/detaproyecto.model';
+import { Material } from 'src/material/material.model';
 
 @ObjectType()
 export class DetaMaterial {

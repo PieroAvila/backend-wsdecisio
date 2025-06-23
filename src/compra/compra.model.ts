@@ -1,6 +1,6 @@
-import { Field, Float, ObjectType } from "@nestjs/graphql";
-import { DetalleCompra } from "src/detallecompra/detacompra.model";
-import { Proveedor } from "src/proveedor/proveedor.model";
+import { Field, Float, ObjectType } from '@nestjs/graphql';
+import { DetalleCompra } from 'src/detallecompra/detacompra.model';
+import { Proveedor } from 'src/proveedor/proveedor.model';
 
 @ObjectType()
 export class Compra {

@@ -64,7 +64,7 @@ export class CargoService {
     const cargoExistente = await this.prisma.cargo.findFirst({
       where: { cargo },
     });
-    if(cargoExistente) {
+    if (cargoExistente) {
       throw new HttpException(
         'El cargo ya existe en la base de datos',
         HttpStatus.CONFLICT,
@@ -79,7 +79,7 @@ export class CargoService {
       });
     } catch (error) {
       throw new HttpException(
-       `Error al registrar el cargo ${error}`,
+        `Error al registrar el cargo ${error}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

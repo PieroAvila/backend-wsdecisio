@@ -1,5 +1,5 @@
-import { Field, ObjectType } from "@nestjs/graphql";
-import { Proyecto } from "src/proyecto/proyecto.model";
+import { Field, ObjectType } from '@nestjs/graphql';
+import { Proyecto } from 'src/proyecto/proyecto.model';
 
 @ObjectType()
 export class Cliente {
