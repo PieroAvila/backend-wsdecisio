@@ -1,7 +1,7 @@
-import { Field, Float, ObjectType } from "@nestjs/graphql";
-import { Actividad } from "src/actividad/actividad.model";
-import { Cliente } from "src/cliente/cliente.model";
-import { DetaProyecto } from "src/detaproyecto/detaproyecto.model";
+import { Field, Float, ObjectType } from '@nestjs/graphql';
+import { Actividad } from 'src/actividad/actividad.model';
+import { Cliente } from 'src/cliente/cliente.model';
+import { DetaProyecto } from 'src/detaproyecto/detaproyecto.model';
 
 @ObjectType()
 export class Proyecto {

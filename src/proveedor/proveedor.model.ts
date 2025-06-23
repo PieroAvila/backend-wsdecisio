@@ -1,5 +1,5 @@
-import { Field, ObjectType } from "@nestjs/graphql";
-import { Compra } from "src/compra/compra.model";
+import { Field, ObjectType } from '@nestjs/graphql';
+import { Compra } from 'src/compra/compra.model';
 
 @ObjectType()
 export class Proveedor {
