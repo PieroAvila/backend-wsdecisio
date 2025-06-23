@@ -79,7 +79,7 @@ export class CargoService {
       });
     } catch (error) {
       throw new HttpException(
-        'Error al registrar el cargo',
+       `Error al registrar el cargo ${error}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
