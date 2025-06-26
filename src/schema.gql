@@ -2,10 +2,118 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Cliente {
+  dniCliente: String!
+  nombre: String!
+  correo: String!
+  telefono: String!
+  proyectos: [Proyecto!]
+}
+
+type Mantenimiento {
+  idMantenimiento: Int!
+  codMaquinaria: String!
+  fechaInicio: String!
+  fechaFin: String
+  estado: String!
+  maquinaria: Maquinaria!
+}
+
+type Maquinaria {
+  codMaquinaria: String!
+  descripcion: String!
+  cantidad: Int!
+  estado: String!
+  mantenimientos: [Mantenimiento!]
+  detalleProyectos: [DetaMaquinaria!]
+}
+
+type DetaMaquinaria {
+  idDetaMaquinaria: Int!
+  idDetaProyecto: Int!
+  codMaquinaria: String!
+  detaProyecto: DetaProyecto!
+  maquinaria: Maquinaria!
+}
+
+type Material {
+  codMaterial: String!
+  descripcion: String!
+  cantidad: Int!
+  unidadMedida: String!
+  detalleProyectos: [Material!]
+}
+
+type DetaMaterial {
+  idDetaMaterial: Int!
+  idDetaProyecto: Int!
+  codMaterial: String!
+  cantidad: Int!
+  cantidadUsada: Int!
+  cantidadRestante: Int
+  detaProyecto: DetaProyecto!
+  material: Material!
+}
+
+type DetaProyecto {
+  idDetaProyecto: Int!
+  codProyecto: String!
+  proyecto: Proyecto!
+  materiales: [DetaMaterial!]
+  maquinarias: [DetaMaquinaria!]
+}
+
+type Proyecto {
+  codProyecto: String!
+  nombre: String!
+  cliente: Cliente!
+  fechaInicio: String!
+  fechaFin: String!
+  estado: String!
+  costoProyecto: Float!
+  detalles: [DetaProyecto!]
+  actividades: [Actividad!]
+}
+
+type Actividad {
+  idActividad: Int!
+  codProyecto: String!
+  dniPersonal: String!
+  tipoActividad: String!
+  descripcion: String!
+  estado: String!
+  duracionEstimada: Int!
+  duracionReal: Int
+  proyecto: Proyecto!
+  personal: Personal!
+}
+
+type Usuario {
+  usuario: String!
+  clave: String!
+  dniPersonal: String!
+  personal: Personal!
+}
+
+type Personal {
+  dniPersonal: String!
+  nombre: String!
+  apellido: String!
+  edad: Int!
+  correo: String!
+  telefono: String!
+  cuentaBcp: String!
+  idCargo: Int!
+  cargo: Cargo
+  usuarios: [Usuario!]
+  actividades: [Actividad!]
+}
+
 type Cargo {
   idCargo: Int!
   cargo: String!
   pagoHora: Float!
+  personales: [Personal!]
 }
 
 type Query {
@@ -14,12 +122,27 @@ type Query {
   obtenerCargoMejorPagado: String
   obtenerMontoTotalHora(cargo: String): Float!
   obtenerCargoPorNombre(cargo: String!): Cargo
+  obtenerPersonales: [Personal!]!
+  obtenerConteoPersonales: Int!
+  obtenerConteoPersonalesConCargo: Int!
+  obtenerConteoPersonalesSinCargo: Int!
+  obtenerMontoTotalPorHora(edad: Int, cargo: String): Float!
+  obtenerMontoTotalPorDia(edad: Int, cargo: String): Float!
+  obtenerMontoTotalPorSemana(edad: Int, cargo: String): Float!
+  obtenerMontoTotalPorMes(edad: Int, cargo: String): Float!
+  obtenerPersonalesPorCargo(cargo: String!): [Personal!]!
+  obtenerPersonalesPorEdad(edad: Int!): [Personal!]!
+  obtenerCargosDisponibles: [String!]!
+  obtenerEdadesDisponibles: [Int!]!
 }
 
 type Mutation {
   crearCargo(data: CrearCargoInput!): Boolean!
   actualizarCargo(idCargo: Int!, data: ActualizarCargoInput!): Cargo!
   borrarCargo(cargo: String!): Boolean!
+  crearPersonal(input: CrearPersonalInput!): Boolean!
+  actualizarPersonal(dniPersonal: String!, input: ActualizarPersonalInput!): Personal!
+  borrarPersonal(dniPersonal: String!): Boolean!
 }
 
 input CrearCargoInput {
@@ -29,4 +152,25 @@ input CrearCargoInput {
 
 input ActualizarCargoInput {
   pagoHora: Float!
+}
+
+input CrearPersonalInput {
+  dniPersonal: String!
+  nombre: String!
+  apellido: String!
+  edad: Int!
+  correo: String!
+  telefono: String!
+  cuentaBcp: String!
+  idCargo: Int!
+}
+
+input ActualizarPersonalInput {
+  nombre: String!
+  apellido: String!
+  edad: Int!
+  correo: String!
+  telefono: String!
+  cuentaBcp: String!
+  idCargo: Int!
 }

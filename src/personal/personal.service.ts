@@ -1,8 +1,9 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PersonalData } from "./personal.interface";
 import { CrearPersonalInput } from "./crear-personal.input";
-import { Cliente, Proveedor } from "@prisma/client";
+import { Cliente, Personal, Proveedor } from "@prisma/client";
+import { ActualizarPersonalInput } from "./actualizar-personal.input";
 
 @Injectable()
 export class PersonalService {
@@ -244,6 +245,93 @@ export class PersonalService {
         const dniExistente2 = await this.prisma.cliente.findFirst({
             where: { dniCliente },
         });
-        
+        const correoExistente = await this.prisma.personal.findFirst({
+            where: { correo },
+        });
+        const telefonoExistente = await this.prisma.personal.findFirst({
+            where: { telefono },
+        });
+        const cuentabcpExistente = await this.prisma.personal.findFirst({
+            where: { cuentaBcp },
+        });
+        if (dniExistente || dniExistente2) {
+            throw new HttpException(
+                'El DNI ya existe en la base de datos',
+                HttpStatus.CONFLICT,
+            );
+        }
+        if (correoExistente) {
+            throw new HttpException(
+                'El correo ya existe en la base de datos',
+                HttpStatus.CONFLICT,
+            );
+        }
+        if (telefonoExistente) {
+            throw new HttpException(
+                'El telefono ya existe en la base de datos',
+                HttpStatus.CONFLICT,
+            );
+        }
+        if (cuentabcpExistente) {
+            throw new HttpException(
+                'La cuenta BCP ya existe en la base de datos',
+                HttpStatus.CONFLICT,
+            );
+        }
+        try {
+            await this.prisma.personal.create({
+                data: {
+                    dniPersonal,
+                    nombre,
+                    apellido,
+                    edad,
+                    correo,
+                    telefono,
+                    cuentaBcp,
+                    idCargo,
+                },
+            });
+        } catch (error) {
+            throw new HttpException(
+                `Error al registrar el personal ${error}`,
+                HttpStatus.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+    
+    async actualizarPersonal(
+        dniPersonal: string,
+        input: ActualizarPersonalInput,
+    ): Promise<Personal> {
+       const dniExistente = await this.prisma.personal.findUnique({
+        where: { dniPersonal },
+       });
+       if (!dniExistente) {
+        throw new HttpException(
+            'El personal no existe en la base de datos',
+            HttpStatus.NOT_FOUND,
+        );
+       }
+       return this.prisma.personal.update({
+        where: { dniPersonal },
+        data: {
+            ...input,
+        }
+       });
+    }
+
+    async borrarPersonal(dniPersonal: string): Promise<void> {
+        const personales = await this.prisma.personal.findMany({
+            where: { dniPersonal },
+        });
+        if (personales.length === 0) {
+            throw new HttpException(
+                `El personal con DNI ${dniPersonal} no existe en la base de datos`,
+                HttpStatus.NOT_FOUND,
+            );
+        }
+        await this.prisma.personal.deleteMany({
+            where: { dniPersonal },
+        });
     }
 }
