@@ -134,6 +134,8 @@ type Query {
   obtenerPersonalesPorEdad(edad: Int!): [Personal!]!
   obtenerCargosDisponibles: [String!]!
   obtenerEdadesDisponibles: [Int!]!
+  obtenerUsuarios: [Usuario!]!
+  obtenerConteoUsuarios: Int!
 }
 
 type Mutation {

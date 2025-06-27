@@ -226,7 +226,6 @@ export class PersonalService {
     async crearPersonal(
         input: CrearPersonalInput,
         cliente: Cliente,
-        proveedor: Proveedor,
     ): Promise<void> {
         const {
             dniPersonal,

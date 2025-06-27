@@ -5,6 +5,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { CargoModule } from './cargo/cargo.module';
 import { join } from 'path';
 import { PersonalModule } from './personal/personal.module';
+import { UsuarioModule } from './usuario/usuario.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PersonalModule } from './personal/personal.module';
     PrismaModule,
     CargoModule,
     PersonalModule,
+    UsuarioModule,
   ],
   controllers: [],
   providers: [],

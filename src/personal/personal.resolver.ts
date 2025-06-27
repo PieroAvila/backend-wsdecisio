@@ -89,7 +89,7 @@ export class PersonalResolver {
     async crearPersonal(
         @Args('input') input: CrearPersonalInput,
     ): Promise<boolean> {
-        await this.personalService.crearPersonal(input, {} as any, {} as any);
+        await this.personalService.crearPersonal(input, {} as any);
         return true;
     }
 
