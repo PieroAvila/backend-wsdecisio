@@ -87,18 +87,18 @@ export class PersonalResolver {
 
     @Mutation(() => Boolean)
     async crearPersonal(
-        @Args('input') input: CrearPersonalInput,
+        @Args('data') data: CrearPersonalInput,
     ): Promise<boolean> {
-        await this.personalService.crearPersonal(input, {} as any);
+        await this.personalService.crearPersonal(data);
         return true;
     }
 
     @Mutation(() => Personal)
     async actualizarPersonal(
         @Args('dniPersonal') dniPersonal: string,
-        @Args('input') input: ActualizarPersonalInput,
+        @Args('data') data: ActualizarPersonalInput,
     ) {
-        return this.personalService.actualizarPersonal(dniPersonal,input);
+        return this.personalService.actualizarPersonal(dniPersonal,data);
     }
 
     @Mutation(() => Boolean)

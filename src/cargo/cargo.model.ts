@@ -6,7 +6,7 @@ export class Cargo {
   @Field(() => Int)
   idCargo: number;
 
-  @Field()
+  @Field({ nullable: true})
   cargo: string;
 
   @Field(() => Float)

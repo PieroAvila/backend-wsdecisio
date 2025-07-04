@@ -26,8 +26,8 @@ export class Personal {
   @Field()
   cuentaBcp: string;
 
-  @Field(() => Int)
-  idCargo: number;
+  @Field(() => Int, { nullable: true})
+  idCargo?: number;
 
   @Field(() => Cargo, { nullable: true })
   cargo?: Cargo;

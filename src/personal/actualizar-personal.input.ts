@@ -13,7 +13,7 @@ import {
 
 @InputType()
 export class ActualizarPersonalInput {
-  @Field()
+  @Field({ nullable: true })
   @IsOptional()
   @IsString({ message: 'El nombre debe ser una cadena de texto' })
   @Matches(/^[A-Za-zñÑ\s]+$/, {
@@ -22,7 +22,7 @@ export class ActualizarPersonalInput {
   @MaxLength(60, { message: 'El nombre debe tener 60 caracteres como máximo' })
   nombre?: string;
 
-  @Field()
+  @Field({ nullable: true })
   @IsOptional()
   @IsString({ message: 'El apellido debe ser una cadena de texto' })
   @Matches(/^[A-Za-zñÑ\s]+$/, {
@@ -31,14 +31,14 @@ export class ActualizarPersonalInput {
   @MaxLength(60, { message: 'El nombre debe tener 60 caracteres como máximo' })
   apellido?: string;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsInt({ message: 'La edad debe ser un numero entero' })
   @Min(18, { message: 'La edad debe ser mayor de 17 años' })
   @Max(65, { message: 'La edad debe ser menor a 66 años' })
   edad?: number;
 
-  @Field()
+  @Field({ nullable: true })
   @IsOptional()
   @IsEmail({}, { message: 'debe cumplir con el formato del correo' })
   @Matches(/^[\w.-]+@weldingsteelsg\.com$/, {
@@ -47,7 +47,7 @@ export class ActualizarPersonalInput {
   @MaxLength(60, { message: 'El correo debe tener 60 caracteres' })
   correo?: string;
 
-  @Field()
+  @Field({ nullable: true })
   @IsOptional()
   @IsString({ message: 'El telefono debe ser una cadena de texto' })
   @Matches(/^9\d{8}$/, {
@@ -56,14 +56,14 @@ export class ActualizarPersonalInput {
   @Length(9, 9, { message: 'El telefono debe tener 9 digitos' })
   telefono?: string;
 
-  @Field()
+  @Field({ nullable: true })
   @IsOptional()
   @IsString({ message: 'La cuenta BCP debe ser una cadena de texto' })
   @Matches(/^[0-9]+$/, { message: 'La cuenta BCP solo debe contener números' })
   @Length(14, 14, { message: 'La cuenta BCP debe contener 14 digitos' })
   cuentaBcp?: string;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsInt({ message: 'El cargo debe ser un numero entero' })
   idCargo?: number;

@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PersonalData } from "./personal.interface";
 import { CrearPersonalInput } from "./crear-personal.input";
-import { Cliente, Personal, Proveedor } from "@prisma/client";
+import { Cliente, Personal } from "@prisma/client";
 import { ActualizarPersonalInput } from "./actualizar-personal.input";
 
 @Injectable()
@@ -25,7 +25,7 @@ export class PersonalService {
             telefono: p.telefono,
             cuentaBcp: p.cuentaBcp,
             idCargo: p.idCargo,
-            cargo: p.cargo?.cargo || '',
+            cargo: p.cargo,
         }));
     }
 
@@ -180,7 +180,7 @@ export class PersonalService {
             telefono: p.telefono,
             cuentaBcp: p.cuentaBcp,
             idCargo: p.idCargo,
-            cargo: p.cargo?.cargo || '',
+            cargo: p.cargo,
         }));
     }
 
@@ -202,7 +202,7 @@ export class PersonalService {
             telefono: p.telefono,
             cuentaBcp: p.cuentaBcp,
             idCargo: p.idCargo,
-            cargo: p.cargo?.cargo || '',
+            cargo: p.cargo,
         }));
     }
 
@@ -225,7 +225,6 @@ export class PersonalService {
 
     async crearPersonal(
         input: CrearPersonalInput,
-        cliente: Cliente,
     ): Promise<void> {
         const {
             dniPersonal,
@@ -237,13 +236,12 @@ export class PersonalService {
             cuentaBcp,
             idCargo,
         } = input;
-        const { dniCliente } = cliente;
         const dniExistente = await this.prisma.personal.findFirst({
             where: { dniPersonal },
         });
         const dniExistente2 = await this.prisma.cliente.findFirst({
-            where: { dniCliente },
-        });
+            where: { dniCliente: dniPersonal },
+        });        
         const correoExistente = await this.prisma.personal.findFirst({
             where: { correo },
         });
@@ -315,6 +313,9 @@ export class PersonalService {
         where: { dniPersonal },
         data: {
             ...input,
+        },
+        include: {
+            cargo: true,
         }
        });
     }

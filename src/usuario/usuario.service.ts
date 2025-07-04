@@ -61,8 +61,7 @@ export class UsuarioService {
     }
 
     async crearUsuario(
-        input: CrearUsuarioInput,
-        personal: Personal,
+        input: CrearUsuarioInput
     ): Promise<void> {
         const {
             usuario,
@@ -127,6 +126,13 @@ export class UsuarioService {
         return this.prisma.usuario.update({
             where: { usuario },
             data: dataToUpdate,
+            include: {
+                personal: {
+                    include: {
+                        cargo: true,
+                    }
+                }
+            }
         });
     }
 

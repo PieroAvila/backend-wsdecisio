@@ -12,6 +12,12 @@ export class Usuario {
   @Field()
   dniPersonal: string;
 
-  @Field(() => Personal)
+  @Field()
+  nombre: string;
+
+  @Field({nullable: true })
+  cargo: string;
+  
+  @Field(() => Personal, {nullable: true})
   personal: Personal;
 }

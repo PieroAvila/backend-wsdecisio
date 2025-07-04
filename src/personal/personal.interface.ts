@@ -1,3 +1,5 @@
+import { Decimal } from "@prisma/client/runtime/library";
+
 export interface PersonalData {
     dniPersonal: string;
     edad: number;
@@ -5,5 +7,9 @@ export interface PersonalData {
     telefono: string;
     cuentaBcp: string;
     idCargo: number | null;
-    cargo: string;
+    cargo: {
+      idCargo: number;
+      cargo: string;
+      pagoHora: Decimal;
+    } | null;
   }

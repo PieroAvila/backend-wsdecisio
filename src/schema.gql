@@ -92,7 +92,9 @@ type Usuario {
   usuario: String!
   clave: String!
   dniPersonal: String!
-  personal: Personal!
+  nombre: String!
+  cargo: String
+  personal: Personal
 }
 
 type Personal {
@@ -103,7 +105,7 @@ type Personal {
   correo: String!
   telefono: String!
   cuentaBcp: String!
-  idCargo: Int!
+  idCargo: Int
   cargo: Cargo
   usuarios: [Usuario!]
   actividades: [Actividad!]
@@ -111,7 +113,7 @@ type Personal {
 
 type Cargo {
   idCargo: Int!
-  cargo: String!
+  cargo: String
   pagoHora: Float!
   personales: [Personal!]
 }
@@ -136,15 +138,19 @@ type Query {
   obtenerEdadesDisponibles: [Int!]!
   obtenerUsuarios: [Usuario!]!
   obtenerConteoUsuarios: Int!
+  obtenerUsuariosPorDNI(dniPersonal: String!): [Usuario!]!
 }
 
 type Mutation {
   crearCargo(data: CrearCargoInput!): Boolean!
   actualizarCargo(idCargo: Int!, data: ActualizarCargoInput!): Cargo!
   borrarCargo(cargo: String!): Boolean!
-  crearPersonal(input: CrearPersonalInput!): Boolean!
-  actualizarPersonal(dniPersonal: String!, input: ActualizarPersonalInput!): Personal!
+  crearPersonal(data: CrearPersonalInput!): Boolean!
+  actualizarPersonal(dniPersonal: String!, data: ActualizarPersonalInput!): Personal!
   borrarPersonal(dniPersonal: String!): Boolean!
+  crearUsuario(data: CrearUsuarioInput!): Boolean!
+  actualizarUsuario(usuario: String!, data: ActualizarUsuarioInput!): Usuario!
+  borrarUsuario(usuario: String!): Boolean!
 }
 
 input CrearCargoInput {
@@ -168,11 +174,21 @@ input CrearPersonalInput {
 }
 
 input ActualizarPersonalInput {
-  nombre: String!
-  apellido: String!
-  edad: Int!
-  correo: String!
-  telefono: String!
-  cuentaBcp: String!
-  idCargo: Int!
+  nombre: String
+  apellido: String
+  edad: Int
+  correo: String
+  telefono: String
+  cuentaBcp: String
+  idCargo: Int
+}
+
+input CrearUsuarioInput {
+  usuario: String!
+  clave: String!
+  dniPersonal: String!
+}
+
+input ActualizarUsuarioInput {
+  clave: String!
 }
