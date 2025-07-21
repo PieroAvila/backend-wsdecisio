@@ -7,14 +7,20 @@ export class Compra {
   @Field()
   codCompra: string;
 
-  @Field(() => Proveedor)
-  proveedor: Proveedor;
+  @Field()
+  rucProveedor: string;
+
+  @Field()
+  razonSocial: string;
 
   @Field(() => Float, { nullable: true })
   costoTotal?: number;
 
   @Field()
   fechaCompra: string;
+
+  @Field(()=> Proveedor, { nullable: true})
+  proveedor: Proveedor;
 
   @Field(() => [DetalleCompra], { nullable: true })
   detalles?: DetalleCompra[];

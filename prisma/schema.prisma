@@ -54,7 +54,7 @@ model Compra {
   codCompra     String         @id @db.Char(10)
   rucProveedor  String?        @db.Char(11)
   proveedor     Proveedor?     @relation(fields: [rucProveedor], references: [rucProveedor], onDelete: Cascade)
-  costoTotal    Decimal
+  costoTotal    Decimal?
   fechaCompra   DateTime
   detalleCompra DetalleCompra?
 }
@@ -68,6 +68,8 @@ model DetalleCompra {
   categoria   String  @db.Char(20)
   cantidad    Int
   estado      String  @default("DISPONIBLE") @db.Char(20)
+  unidadMedida String @db.VarChar(20)
+  precioUnit Decimal
 }
 
 model Maquinaria {

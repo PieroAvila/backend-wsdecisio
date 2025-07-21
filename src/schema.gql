@@ -118,6 +118,38 @@ type Cargo {
   personales: [Personal!]
 }
 
+type DetalleCompra {
+  idDetalle: Int!
+  codCompra: String!
+  codigo: String!
+  descripcion: String!
+  categoria: String!
+  cantidad: Int!
+  estado: String!
+  unidadMedida: String!
+  precioUnit: Float!
+  subtotal: Float
+  fechaCompra: String
+  compra: Compra!
+}
+
+type Compra {
+  codCompra: String!
+  rucProveedor: String!
+  razonSocial: String!
+  costoTotal: Float
+  fechaCompra: String!
+  proveedor: Proveedor
+  detalles: [DetalleCompra!]
+}
+
+type Proveedor {
+  rucProveedor: String!
+  razonSocial: String!
+  cuentaBcp: String!
+  compras: [Compra!]
+}
+
 type Query {
   obtenerCargos: [Cargo!]!
   obtenerConteoCargos: Int!
@@ -139,6 +171,25 @@ type Query {
   obtenerUsuarios: [Usuario!]!
   obtenerConteoUsuarios: Int!
   obtenerUsuariosPorDNI(dniPersonal: String!): [Usuario!]!
+  obtenerClientes: [Cliente!]!
+  obtenerConteoClientes: Int!
+  obtenerClientesPorDNI(dniCliente: String!): [Cliente!]!
+  obtenerClientesPorNombre(nombre: String!): [Cliente!]!
+  obtenerProveedores: [Proveedor!]!
+  obtenerConteoProveedores: Int!
+  obtenerProveedorPorRUC(rucProveedor: String!): Proveedor
+  obtenerProveedorPorRazonSocial(razonSocial: String!): Proveedor
+  obtenerCompras: [Compra!]!
+  obtenerConteoCompras(desde: String, hasta: String, ruc: String): Int!
+  obtenerComprasPorFecha(desde: String!, hasta: String!): [Compra!]!
+  obtenerMontoCompras(desde: String, hasta: String, ruc: String): Float!
+  obtenerProveedoresDisponibles: [String!]!
+  obtenerProveedoresActivos: Int!
+  obtenerProveedoresInactivos: Int!
+  obtenerDetalleCompra: [DetalleCompra!]!
+  obtenerConteoDetallePorCompra(codigo: String): Int!
+  obtenerComprasDisponibles: [String!]!
+  obtenerMaquinarias: [Maquinaria!]!
 }
 
 type Mutation {
@@ -147,10 +198,20 @@ type Mutation {
   borrarCargo(cargo: String!): Boolean!
   crearPersonal(data: CrearPersonalInput!): Boolean!
   actualizarPersonal(dniPersonal: String!, data: ActualizarPersonalInput!): Personal!
-  borrarPersonal(dniPersonal: String!): Boolean!
+  borrarPersonal(rucProveedor: String!): Boolean!
   crearUsuario(data: CrearUsuarioInput!): Boolean!
   actualizarUsuario(usuario: String!, data: ActualizarUsuarioInput!): Usuario!
   borrarUsuario(usuario: String!): Boolean!
+  crearCliente(data: CrearClienteInput!): Boolean!
+  actualizarCliente(dniCliente: String!, data: ActualizarClienteInput!): Cliente!
+  borrarCliente(dniCliente: String!): Boolean!
+  crearProveedor(data: CrearProveedorInput!): Boolean!
+  actualizarProveedor(rucProveedor: String!, data: ActualizarProveedorInput!): Proveedor!
+  crearCompra(data: CrearCompraInput!): Boolean!
+  borrarCompra(codCompra: String!): Boolean!
+  crearDetaCompra(data: CrearDetaCompraInput!): Boolean!
+  actualizarDetalleCompra(idDetalle: Int!, data: ActualizarDetaCompraInput!): [DetalleCompra!]!
+  borrarDetalleCompra(idDetalle: Float!): Boolean!
 }
 
 input CrearCargoInput {
@@ -191,4 +252,51 @@ input CrearUsuarioInput {
 
 input ActualizarUsuarioInput {
   clave: String!
+}
+
+input CrearClienteInput {
+  dniCliente: String!
+  nombre: String!
+  correo: String!
+  telefono: String!
+}
+
+input ActualizarClienteInput {
+  nombre: String
+  correo: String
+  telefono: String
+}
+
+input CrearProveedorInput {
+  rucProveedor: String!
+  razonSocial: String!
+  cuentaBcp: String!
+}
+
+input ActualizarProveedorInput {
+  cuentaBcp: String
+}
+
+input CrearCompraInput {
+  codCompra: String!
+  rucProveedor: String!
+  costoTotal: Float
+  fechaCompra: String!
+}
+
+input CrearDetaCompraInput {
+  codCompra: String!
+  codigo: String!
+  descripcion: String!
+  categoria: String!
+  cantidad: Float!
+  estado: String
+  unidadMedida: String!
+  precioUnit: Float!
+}
+
+input ActualizarDetaCompraInput {
+  descripcion: String
+  cantidad: Float
+  precioUnit: Float
 }

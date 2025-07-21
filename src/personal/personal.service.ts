@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PersonalData } from "./personal.interface";
 import { CrearPersonalInput } from "./crear-personal.input";
-import { Cliente, Personal } from "@prisma/client";
+import { Personal } from "@prisma/client";
 import { ActualizarPersonalInput } from "./actualizar-personal.input";
 
 @Injectable()

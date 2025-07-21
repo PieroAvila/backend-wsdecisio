@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UsuarioData } from "./usuario.interface";
 import { CrearUsuarioInput } from "./crear-usuario.input";
-import { Personal, Usuario } from "@prisma/client";
+import { Usuario } from "@prisma/client";
 import * as bcrypt from 'bcrypt';
 import { ActualizarUsuarioInput } from "./actualizar-usuario.input";
 
