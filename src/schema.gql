@@ -20,9 +20,9 @@ type Mantenimiento {
 }
 
 type Maquinaria {
+  idMaquinaria: Int!
   codMaquinaria: String!
   descripcion: String!
-  cantidad: Int!
   estado: String!
   mantenimientos: [Mantenimiento!]
   detalleProyectos: [DetaMaquinaria!]
@@ -189,7 +189,10 @@ type Query {
   obtenerDetalleCompra: [DetalleCompra!]!
   obtenerConteoDetallePorCompra(codigo: String): Int!
   obtenerComprasDisponibles: [String!]!
-  obtenerMaquinarias: [Maquinaria!]!
+  obtenerMaquinarias(estado: String, codigo: String): [Maquinaria!]!
+  obtenerConteoMaquinarias(codigo: String): Int!
+  obtenerMateriales(codigo: String): [Material!]!
+  obtenerConteoMateriales(codigo: String): Int!
 }
 
 type Mutation {
@@ -212,6 +215,9 @@ type Mutation {
   crearDetaCompra(data: CrearDetaCompraInput!): Boolean!
   actualizarDetalleCompra(idDetalle: Int!, data: ActualizarDetaCompraInput!): [DetalleCompra!]!
   borrarDetalleCompra(idDetalle: Float!): Boolean!
+  crearMaquinaria(data: CrearMaquinariaInput!): Boolean!
+  actualizarMaquinaria(idMaquinaria: Float!, data: ActualizarMaquinariaInput!): Maquinaria!
+  borrarMaquinaria(codMaquinaria: String!): Boolean!
 }
 
 input CrearCargoInput {
@@ -299,4 +305,16 @@ input ActualizarDetaCompraInput {
   descripcion: String
   cantidad: Float
   precioUnit: Float
+}
+
+input CrearMaquinariaInput {
+  codMaquinaria: String!
+  cantidad: Float!
+  descripcion: String!
+  estado: String
+}
+
+input ActualizarMaquinariaInput {
+  descripcion: String
+  estado: String
 }

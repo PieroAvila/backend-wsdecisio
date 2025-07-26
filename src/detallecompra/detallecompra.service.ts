@@ -3,12 +3,11 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { CrearDetaCompraInput } from "./crear-detallecompra.input";
 import { Decimal } from "@prisma/client/runtime/library";
 import { DetalleCompraData } from "./detallecompra.interface";
-import { DetalleCompra } from "@prisma/client";
 import { ActualizarDetaCompraInput } from "./actualizar-detallecompra.input";
 
 @Injectable()
 export class DetaCompraService {
-    constructor(private prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService) {}
 
     async obtenerDetalleCompra(): Promise<DetalleCompraData[]> {
         const detallescompra = await this.prisma.detalleCompra.findMany({
@@ -111,26 +110,15 @@ export class DetaCompraService {
             });
 
             if (categoria === 'MAQUINARIA') {
-                const maquinariaExistente = await this.prisma.maquinaria.findUnique({
-                    where: { codMaquinaria: codigo },
-                });
-
-                if (maquinariaExistente) {
-                    await this.prisma.maquinaria.update({
-                        where: { codMaquinaria: codigo },
-                        data: {
-                            cantidad: maquinariaExistente.cantidad + cantidad,
-                        }
-                    });
-                } else {
+                for (let i = 0; i < cantidad; i++) {
                     await this.prisma.maquinaria.create({
                         data: {
                             codMaquinaria: codigo,
                             descripcion,
-                            cantidad
+                            estado: estado ?? 'DISPONIBLE',
                         },
                     });
-                }
+                }  
             } else if (categoria === 'MATERIAL') {
                 if (!unidadMedida) {
                     throw new HttpException(

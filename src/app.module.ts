@@ -11,6 +11,7 @@ import { ProveedorModule } from './proveedor/proveedor.module';
 import { CompraModule } from './compra/compra.module';
 import { DetaCompraModule } from './detallecompra/detallecompra.module';
 import { MaquinariaModule } from './maquinaria/maquinaria.module';
+import { MaterialModule } from './material/material.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { MaquinariaModule } from './maquinaria/maquinaria.module';
     CompraModule,
     DetaCompraModule,
     MaquinariaModule,
+    MaterialModule,
   ],
   controllers: [],
   providers: [],

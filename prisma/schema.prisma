@@ -73,9 +73,9 @@ model DetalleCompra {
 }
 
 model Maquinaria {
-  codMaquinaria  String           @id @db.Char(10)
+  idMaquinaria   Int              @id @default(autoincrement())
+  codMaquinaria  String           @db.Char(10)
   descripcion    String           @db.VarChar(255)
-  cantidad       Int
   estado         String           @default("DISPONIBLE") @db.Char(20)
   detaMaquinaria DetaMaquinaria[]
   mantenimiento  Mantenimiento[]
@@ -125,8 +125,8 @@ model DetaMaquinaria {
   idDetaMaquinaria Int          @id @default(autoincrement())
   idDetaProyecto   Int
   detaProyecto     DetaProyecto @relation(fields: [idDetaProyecto], references: [idDetaProyecto], onDelete: Cascade)
-  codMaquinaria    String       @db.Char(10)
-  maquinaria       Maquinaria   @relation(fields: [codMaquinaria], references: [codMaquinaria], onDelete: Cascade)
+  idMaquinaria    Int      
+  maquinaria       Maquinaria   @relation(fields: [idMaquinaria], references: [idMaquinaria], onDelete: Cascade)
 }
 
 model Actividad {
@@ -144,8 +144,8 @@ model Actividad {
 
 model Mantenimiento {
   idMantenimiento Int        @id @default(autoincrement())
-  codMaquinaria   String     @db.Char(10)
-  maquinaria      Maquinaria @relation(fields: [codMaquinaria], references: [codMaquinaria], onDelete: Cascade)
+  idMaquinaria    Int     
+  maquinaria      Maquinaria @relation(fields: [idMaquinaria], references: [idMaquinaria], onDelete: Cascade)
   fechaInicio     DateTime
   fechaFin        DateTime?
   estado          String     @db.Char(20)

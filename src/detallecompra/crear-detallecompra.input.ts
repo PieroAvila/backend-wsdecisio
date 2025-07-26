@@ -30,7 +30,7 @@ export class CrearDetaCompraInput {
     @Field()
     @IsNotEmpty({ message: 'La cantidad es requerida' })
     @IsInt({ message: 'La cantidad debe ser un numero entero' })
-    @Min(1, { message: 'La cantidad deber ser al menos 1' })
+    @Min(1, { message: 'La cantidad debe ser al menos 1' })
     cantidad: number;
 
     @Field({ nullable: true })

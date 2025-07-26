@@ -4,14 +4,15 @@ import { Mantenimiento } from 'src/mantenimiento/mantenimiento.model';
 
 @ObjectType()
 export class Maquinaria {
+
+  @Field(() => Int)
+  idMaquinaria: number;
+
   @Field()
   codMaquinaria: string;
 
   @Field()
   descripcion: string;
-
-  @Field(() => Int)
-  cantidad: number;
 
   @Field()
   estado: string;
