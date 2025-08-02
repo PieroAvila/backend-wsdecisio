@@ -41,9 +41,9 @@ export class MaquinariaResolver {
 
     @Mutation(() => Boolean)
     async borrarMaquinaria(
-        @Args('codMaquinaria') codMaquinaria: string,
+        @Args('idMaquinaria') idMaquinaria: number,
     ) {
-        await this.maquinariaService.borrarMaquinaria(codMaquinaria);
+        await this.maquinariaService.borrarMaquinaria(idMaquinaria);
         return true;
     }
 }

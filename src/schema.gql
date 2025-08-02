@@ -65,8 +65,10 @@ type DetaProyecto {
 
 type Proyecto {
   codProyecto: String!
-  nombre: String!
+  nombreProyecto: String!
   cliente: Cliente!
+  dniCliente: String!
+  nombre: String!
   fechaInicio: String!
   fechaFin: String!
   estado: String!
@@ -193,6 +195,12 @@ type Query {
   obtenerConteoMaquinarias(codigo: String): Int!
   obtenerMateriales(codigo: String): [Material!]!
   obtenerConteoMateriales(codigo: String): Int!
+  obtenerProyectos: [Proyecto!]!
+  obtenerConteoProyectos(desde: String, hasta: String, cliente: String, estado: String): Int!
+  obtenerMontoTotalProyecto(desde: String, hasta: String, cliente: String): Float!
+  obtenerProyectosPorFecha(desde: String!, hasta: String!): [Proyecto!]!
+  obtenerClientesDisponibles: [String!]!
+  obtenerPromedioProyectosPorCliente: Float!
 }
 
 type Mutation {
@@ -217,7 +225,13 @@ type Mutation {
   borrarDetalleCompra(idDetalle: Float!): Boolean!
   crearMaquinaria(data: CrearMaquinariaInput!): Boolean!
   actualizarMaquinaria(idMaquinaria: Float!, data: ActualizarMaquinariaInput!): Maquinaria!
-  borrarMaquinaria(codMaquinaria: String!): Boolean!
+  borrarMaquinaria(idMaquinaria: Float!): Boolean!
+  crearMaterial(data: CrearMaterialInput!): Boolean!
+  actualizarMaterial(codMaterial: String!, data: ActualizarMaterialInput!): Material!
+  borrarMaterial(codMaterial: String!): Boolean!
+  crearProyecto(data: CrearProyectoInput!): Boolean!
+  actualizarProyecto(codProyecto: String!, data: ActualizarProyectoInput!): [Proyecto!]!
+  borrarProyecto(codProyecto: String!): Boolean!
 }
 
 input CrearCargoInput {
@@ -316,5 +330,31 @@ input CrearMaquinariaInput {
 
 input ActualizarMaquinariaInput {
   descripcion: String
+  estado: String
+}
+
+input CrearMaterialInput {
+  codMaterial: String!
+  descripcion: String!
+  cantidad: Float!
+  unidadMedida: String!
+}
+
+input ActualizarMaterialInput {
+  cantidad: Float
+}
+
+input CrearProyectoInput {
+  codProyecto: String!
+  nombreProyecto: String!
+  dniCliente: String!
+  fechaInicio: String!
+  fechaFin: String!
+  estado: String
+  costoProyecto: Float
+}
+
+input ActualizarProyectoInput {
+  fechaFin: String
   estado: String
 }

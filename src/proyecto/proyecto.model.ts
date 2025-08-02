@@ -9,11 +9,17 @@ export class Proyecto {
   codProyecto: string;
 
   @Field()
-  nombre: string;
+  nombreProyecto: string;
 
   @Field(() => Cliente)
   cliente: Cliente;
 
+  @Field()
+  dniCliente: string;
+
+  @Field()
+  nombre: string;
+  
   @Field()
   fechaInicio: string;
 

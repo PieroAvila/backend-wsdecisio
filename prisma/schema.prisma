@@ -91,7 +91,7 @@ model Material {
 
 model Proyecto {
   codProyecto   String        @id @db.Char(7)
-  nombre        String        @db.VarChar(255)
+  nombreProyecto        String        @db.VarChar(255)
   dniCliente    String        @db.Char(8)
   cliente       Cliente       @relation(fields: [dniCliente], references: [dniCliente], onDelete: Cascade)
   fechaInicio   DateTime

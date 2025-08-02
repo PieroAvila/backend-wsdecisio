@@ -102,18 +102,18 @@ export class MaquinariaService {
         });
     }
 
-    async borrarMaquinaria(codMaquinaria: string): Promise<void> {
+    async borrarMaquinaria(idMaquinaria: number): Promise<void> {
         const maquinarias = await this.prisma.maquinaria.findMany({
-            where: { codMaquinaria },
+            where: { idMaquinaria },
         });
         if (maquinarias.length === 0) {
             throw new HttpException(
-                `La maquinaria con codigo ${codMaquinaria} no existe en la base de datos`,
+                `La maquinaria con codigo ${idMaquinaria} no existe en la base de datos`,
                 HttpStatus.NOT_FOUND,
             );
         }
         await this.prisma.maquinaria.deleteMany({
-            where: { codMaquinaria },
+            where: { idMaquinaria },
         });
     }
 }
