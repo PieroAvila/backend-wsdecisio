@@ -47,10 +47,13 @@ type Material {
 type DetaMaterial {
   idDetaMaterial: Int!
   idDetaProyecto: Int!
+  codProyecto: String!
   codMaterial: String!
+  descripcion: String!
   cantidad: Int!
-  cantidadUsada: Int!
+  cantidadUsada: Int
   cantidadRestante: Int
+  cantidadDisponible: Int!
   detaProyecto: DetaProyecto!
   material: Material!
 }
@@ -201,6 +204,10 @@ type Query {
   obtenerProyectosPorFecha(desde: String!, hasta: String!): [Proyecto!]!
   obtenerClientesDisponibles: [String!]!
   obtenerPromedioProyectosPorCliente: Float!
+  obtenerConteoDetaProyecto: Int!
+  obtenerDetaMaterial: [DetaMaterial!]!
+  obtenerConteoDetaMateriales(proyecto: String): Int!
+  obtenerTotalMaterialUsado(desde: String, hasta: String, proyecto: String): Int!
 }
 
 type Mutation {
@@ -232,6 +239,8 @@ type Mutation {
   crearProyecto(data: CrearProyectoInput!): Boolean!
   actualizarProyecto(codProyecto: String!, data: ActualizarProyectoInput!): [Proyecto!]!
   borrarProyecto(codProyecto: String!): Boolean!
+  crearDetaProyecto(data: CrearDetaProyectoInput!): Boolean!
+  borrarDetaProyecto(idDetaProyecto: Float!): Boolean!
 }
 
 input CrearCargoInput {
@@ -357,4 +366,8 @@ input CrearProyectoInput {
 input ActualizarProyectoInput {
   fechaFin: String
   estado: String
+}
+
+input CrearDetaProyectoInput {
+  codProyecto: String!
 }

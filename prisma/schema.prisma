@@ -117,8 +117,8 @@ model DetaMaterial {
   codMaterial     String       @db.Char(10)
   material        Material     @relation(fields: [codMaterial], references: [codMaterial], onDelete: Cascade)
   cantidad        Int
-  cantidadUsada   Int
-  cantidadRestate Int?
+  cantidadUsada   Int?
+  cantidadRestante Int?
 }
 
 model DetaMaquinaria {

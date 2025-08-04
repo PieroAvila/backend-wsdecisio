@@ -14,6 +14,7 @@ import { MaquinariaModule } from './maquinaria/maquinaria.module';
 import { MaterialModule } from './material/material.module';
 import { ProyectoModule } from './proyecto/proyecto.module';
 import { DetaProyectoModule } from './detaproyecto/detaproyecto.module';
+import { DetaMaterialModule } from './detamaterial/detamaterial.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { DetaProyectoModule } from './detaproyecto/detaproyecto.module';
     MaterialModule,
     ProyectoModule,
     DetaProyectoModule,
+    DetaMaterialModule,
   ],
   controllers: [],
   providers: [],

@@ -11,16 +11,25 @@ export class DetaMaterial {
   idDetaProyecto: number;
 
   @Field()
+  codProyecto: string;
+
+  @Field()
   codMaterial: string;
+
+  @Field()
+  descripcion: string;
 
   @Field(() => Int)
   cantidad: number;
 
-  @Field(() => Int)
-  cantidadUsada: number;
+  @Field(() => Int, { nullable: true })
+  cantidadUsada?: number;
 
   @Field(() => Int, { nullable: true })
   cantidadRestante?: number;
+
+  @Field(() => Int)
+  cantidadDisponible: number;
 
   @Field(() => DetaProyecto)
   detaProyecto: DetaProyecto;
