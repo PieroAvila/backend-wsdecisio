@@ -8,8 +8,10 @@ export class DetaProyectoResolver {
     constructor(private readonly detaproyectoService: DetaProyectoService) {}
 
     @Query(() => Int)
-    async obtenerConteoDetaProyecto() {
-        return this.detaproyectoService.obtenerConteoDetaProyectos();
+    async obtenerConteoDetaProyecto(
+        @Args('proyecto') proyecto: string,
+    ) {
+        return this.detaproyectoService.obtenerConteoDetaProyectos({ proyecto });
     }
 
     @Mutation(() => Boolean)

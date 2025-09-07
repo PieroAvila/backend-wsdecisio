@@ -3,7 +3,7 @@ export interface DetaMaterialData {
     codMaterial: string;
     descripcion: string;
     cantidad: number;
-    cantidadUsada: number;
-    cantidadRestante: number;
+    cantidadUsada: number | null;
+    cantidadRestante: number | null;
     cantidadDisponible: number;
 }

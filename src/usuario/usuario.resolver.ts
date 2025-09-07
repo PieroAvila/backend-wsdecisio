@@ -10,20 +10,19 @@ export class UsuarioResolver {
     constructor(private readonly usuarioService: UsuarioService) {}
 
     @Query(() => [Usuario])
-    async obtenerUsuarios(): Promise<UsuarioData[]> {
-        return this.usuarioService.obtenerUsuarios();
+    async obtenerUsuarios(
+        @Args('usuario', { nullable: true }) usuario?: string,
+        @Args('dni', { nullable: true }) dni?: string,
+    ): Promise<UsuarioData[]> {
+        return this.usuarioService.obtenerUsuarios({usuario, dni});
     }
 
     @Query(() => Int)
-    async obtenerConteoUsuarios() {
-        return this.usuarioService.obtenerConteoUsuarios();
-    }
-
-    @Query(() => [Usuario])
-    async obtenerUsuariosPorDNI(
-        @Args('dniPersonal') dniPersonal: string,
-    ): Promise<UsuarioData[]> {
-        return this.usuarioService.obtenerUsuarioPorDNI(dniPersonal);
+    async obtenerConteoUsuarios(
+        @Args('usuario', { nullable: true }) usuario?: string,
+        @Args('dni', { nullable: true }) dni?: string,
+    ) {
+        return this.usuarioService.obtenerConteoUsuarios({usuario, dni});
     }
 
     @Mutation(() => Boolean)

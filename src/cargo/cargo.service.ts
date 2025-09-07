@@ -8,16 +8,43 @@ import { ActualizarCargoInput } from './actualizar-cargo.input';
 export class CargoService {
   constructor(private prisma: PrismaService) {}
 
-  async obtenerCargos(): Promise<Cargo[]> {
-    return this.prisma.cargo.findMany();
+  async obtenerCargos(filtro?: {
+    cargo?: string;
+  }): Promise<Cargo[]> {
+    let where: any = {};
+
+    if (filtro?.cargo) {
+      where.cargo = filtro.cargo;
+    }
+
+    const cargos = await this.prisma.cargo.findMany({
+      where,
+    });
+    return cargos.map((c) => ({
+      idCargo: c.idCargo,
+      cargo: c.cargo,
+      pagoHora: c.pagoHora,
+    }));
+    
   }
 
-  async obtenerConteoCargos() {
+  async obtenerConteoCargos(filtro?: {
+    cargo?: string;
+  }) {
+
+    let where: any = {};
+
+    if (filtro?.cargo) {
+      where.cargo = filtro.cargo;
+    }
+    
     const resultado = await this.prisma.cargo.aggregate({
       _count: {
         cargo: true,
       },
+      where,
     });
+
     return Number(resultado._count.cargo) || 0;
   }
 
@@ -47,16 +74,6 @@ export class CargoService {
       },
     });
     return resultado?.cargo || null;
-  }
-
-  async obtenerCargoPorNombre(cargo: string): Promise<Cargo | null> {
-    return this.prisma.cargo.findFirst({
-      where: {
-        cargo: {
-          equals: cargo,
-        },
-      },
-    });
   }
 
   async crearCargo(input: CrearCargoInput): Promise<void> {

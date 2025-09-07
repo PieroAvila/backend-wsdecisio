@@ -9,11 +9,32 @@ import { ActualizarPersonalInput } from "./actualizar-personal.input";
 export class PersonalService {
     constructor(private prisma: PrismaService) {}
 
-    async obtenerPersonales(): Promise<PersonalData[]> {
+    async obtenerPersonales(filtro?: {
+        cargo?: string;
+        dni?: string;
+        edad?: number;
+    }): Promise<PersonalData[]> {
+        let where: any = {};
+
+        if (filtro?.cargo) {
+            where.cargo = {
+                cargo: filtro.cargo,
+            }
+        }
+    
+        if (filtro?.edad) {
+            where.edad = filtro.edad;
+        }
+
+        if (filtro?.dni) {
+            where.dniPersonal = filtro.dni;
+        }
+
         const personales = await this.prisma.personal.findMany({
             include: {
                 cargo: true,
             },
+            where,
         });
 
         return personales.map((p) => ({
@@ -29,11 +50,32 @@ export class PersonalService {
         }));
     }
 
-    async obtenerConteoPersonales() {
+    async obtenerConteoPersonales(filtro?: {
+        cargo?: string;
+        dni?: string;
+        edad?: number;
+    }) {
+        let where: any = {};
+
+        if (filtro?.cargo) {
+            where.cargo = {
+                cargo: filtro.cargo,
+            }
+        }
+    
+        if (filtro?.edad) {
+            where.edad = filtro.edad;
+        }
+
+        if (filtro?.dni) {
+            where.dniPersonal = filtro.dni;
+        }
+        
         const resultado = await this.prisma.personal.aggregate({
             _count: {
                 dniPersonal: true,
             },
+            where,
         });
         return Number(resultado._count.dniPersonal) || 0;
     }
@@ -59,6 +101,7 @@ export class PersonalService {
     async obtenerMontoTotalPorHora(filtro?: {
         edad?: number;
         cargo?: string;
+        dni?: string;
     }): Promise<number> {
         const personales = await this.prisma.personal.findMany({
             where: {
@@ -70,6 +113,7 @@ export class PersonalService {
                         },
                     },
                 }),
+                ...(filtro?.dni && { dniPersonal: filtro.dni})
             },
             include: {
                 cargo: true,
@@ -84,6 +128,7 @@ export class PersonalService {
     async obtenerMontoTotalPorDia(filtro?: {
         edad?: number;
         cargo?: string;
+        dni?: string;
     }): Promise<number> {
         const personales = await this.prisma.personal.findMany({
             where: {
@@ -95,6 +140,7 @@ export class PersonalService {
                         },
                     },
                 }),
+                ...(filtro?.dni && { dniPersonal: filtro.dni})
             },
             include: {
                 cargo: true,
@@ -109,6 +155,7 @@ export class PersonalService {
     async obtenerMontoTotalPorSemana(filtro?: {
         edad?: number;
         cargo?: string;
+        dni?: string;
     }): Promise<number> {
         const personales = await this.prisma.personal.findMany({
             where: {
@@ -120,6 +167,7 @@ export class PersonalService {
                         },
                     },
                 }),
+                ...(filtro?.dni && { dniPersonal: filtro.dni})
             },
             include: {
                 cargo: true,
@@ -135,6 +183,7 @@ export class PersonalService {
     async obtenerMontoTotalPorMes(filtro?: {
         edad?: number;
         cargo?: string;
+        dni?: string;
     }): Promise<number> {
         const personales = await this.prisma.personal.findMany({
             where: {
@@ -146,6 +195,7 @@ export class PersonalService {
                         },
                     },
                 }),
+                ...(filtro?.dni && { dniPersonal: filtro.dni})
             },
             include: {
                 cargo: true,
@@ -158,54 +208,6 @@ export class PersonalService {
         return ((total * 8) * 6)*4;
     }
 
-    async obtenerPersonalesPorCargo(cargo: string): Promise<PersonalData[]> {
-        const personales = await this.prisma.personal.findMany({
-            where: {
-                cargo: {
-                    cargo: {
-                        equals: cargo,
-                    },
-                },
-            },
-            include: {
-                cargo: true,
-            },
-        });
-        return personales.map((p) => ({
-            dniPersonal: p.dniPersonal,
-            nombre: p.nombre,
-            apellido: p.apellido,
-            edad: p.edad,
-            correo: p.correo,
-            telefono: p.telefono,
-            cuentaBcp: p.cuentaBcp,
-            idCargo: p.idCargo,
-            cargo: p.cargo,
-        }));
-    }
-
-    async obtenerPersonalesPorEdad(edad: number): Promise<PersonalData[]> {
-        const personales = await this.prisma.personal.findMany({
-            where: {
-                edad: edad,
-            },
-            include: {
-                cargo: true,
-            },
-        });
-        return personales.map((p) => ({
-            dniPersonal: p.dniPersonal,
-            nombre: p.nombre,
-            apellido: p.apellido,
-            edad: p.edad,
-            correo: p.correo,
-            telefono: p.telefono,
-            cuentaBcp: p.cuentaBcp,
-            idCargo: p.idCargo,
-            cargo: p.cargo,
-        }));
-    }
-
     async obtenerCargosDisponibles(): Promise<string[]> {
         const cargos = await this.prisma.cargo.findMany({
             select: { cargo: true },
@@ -213,7 +215,7 @@ export class PersonalService {
         });
         return cargos.map((c) => c.cargo);
     }
-
+ 
     async obtenerEdadesDisponibles(): Promise<number[]> {
         const edades = await this.prisma.personal.findMany({
             select: { edad: true },

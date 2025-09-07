@@ -9,8 +9,12 @@ export class CompraResolver {
     constructor( private readonly compraService: CompraService) {}
 
     @Query(() => [Compra])
-    async obtenerCompras(): Promise<CompraData[]> {
-        return this.compraService.obtenerCompras();
+    async obtenerCompras(
+      @Args('desde', { nullable: true }) desde?: string,
+      @Args('hasta', { nullable: true }) hasta?: string,
+      @Args('ruc', { nullable: true }) ruc?: string,
+    ): Promise<CompraData[]> {
+        return this.compraService.obtenerCompras({desde, hasta, ruc});
     }
     
     @Query(() => Int)
@@ -20,15 +24,6 @@ export class CompraResolver {
       @Args('ruc', { nullable: true }) ruc?: string,
     ): Promise<number> {
       return this.compraService.obtenerConteoCompras({ desde, hasta, ruc });
-    }
-
-
-    @Query(() => [Compra])
-    async obtenerComprasPorFecha(
-      @Args('desde') desde: string,
-      @Args('hasta') hasta: string,
-    ): Promise<CompraData[]> {
-      return this.compraService.obtenerComprasPorFecha({ desde, hasta});
     }
 
     @Query(() => Float)

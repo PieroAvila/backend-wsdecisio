@@ -210,24 +210,38 @@ export class ProyectoService {
             where: { codProyecto },
             include: { cliente: true },
         });
+    
         if (!proyectoExistente) {
             throw new HttpException(
                 'El proyecto no existe en la base de datos',
                 HttpStatus.NOT_FOUND,
             );
         }
-
-        await this.prisma.proyecto.update({
+    
+        const proyectoActualizado = await this.prisma.proyecto.update({
             where: { codProyecto },
-            data: {
-                ...input,
-            },
-        })
-        
+            data: { ...input },
+        });
+    
+        if (input.estado === 'FINALIZADO') {
+            await this.prisma.maquinaria.updateMany({
+                where: {
+                    detaMaquinaria: {
+                        some: {
+                            detaProyecto: {
+                                codProyecto: codProyecto,
+                            },
+                        },
+                    },
+                },
+                data: { estado: 'DISPONIBLE' },
+            });
+        }
+    
         const proyectos = await this.prisma.proyecto.findMany({
             include: { cliente: true },
-        })
-
+        });
+    
         const ProyectoDatos: ProyectoData[] = proyectos.map((p) => ({
             codProyecto: p.codProyecto,
             nombreProyecto: p.nombreProyecto,
@@ -238,8 +252,10 @@ export class ProyectoService {
             estado: p.estado,
             costoProyecto: p.costoProyecto,
         }));
+    
         return ProyectoDatos;
     }
+    
     
     async borrarProyecto(codProyecto: string): Promise<boolean> {
         const proyectos = await this.prisma.proyecto.findMany({

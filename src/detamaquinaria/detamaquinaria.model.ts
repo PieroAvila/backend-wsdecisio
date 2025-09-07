@@ -11,7 +11,13 @@ export class DetaMaquinaria {
   idDetaProyecto: number;
 
   @Field()
+  codProyecto: string;
+
+  @Field()
   codMaquinaria: string;
+
+  @Field()
+  descripcion: string;
 
   @Field(() => DetaProyecto)
   detaProyecto: DetaProyecto;

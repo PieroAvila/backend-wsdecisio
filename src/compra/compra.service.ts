@@ -7,11 +7,32 @@ import { CrearCompraInput } from "./crear-compra.input";
 export class CompraService{
     constructor(private readonly prisma: PrismaService) {}
 
-    async obtenerCompras(): Promise<CompraData[]> {
-        const compras = await this.prisma.compra.findMany({
-            include: {
+    async obtenerCompras(filtro?: {
+      desde?: string;
+      hasta?: string;
+      ruc?: string;
+    }): Promise<CompraData[]> {
+      let where: any = {};
+      
+      if (filtro?.desde && filtro?.hasta) {
+        const desde = new Date(filtro.desde);
+        const hasta = new Date(filtro.hasta);
+        hasta.setHours(23, 59, 59, 999);
+
+        where.fechaCompra = {
+          gte: desde,
+          lte: hasta,
+        }
+      }
+      if (filtro?.ruc) {
+        where.rucProveedor = filtro.ruc;
+      }
+
+      const compras = await this.prisma.compra.findMany({
+          include: {
                 proveedor: true,
-            }
+            },
+            where,
         });
         return compras.map((c) => ({
             codCompra: c.codCompra,
@@ -53,37 +74,6 @@ export class CompraService{
         return Number(resultado._count.codCompra) || 0;
     }
 
-    async obtenerComprasPorFecha(filtro: {
-      desde: string;
-      hasta: string;
-    }): Promise<CompraData[]> {
-      const fechaInicio = new Date(filtro.desde);
-      const fechaFin = new Date(filtro.hasta);
-      fechaFin.setHours(23, 59, 59, 999);
-
-      const compras = await this.prisma.compra.findMany({
-        where: {
-          fechaCompra: {
-            gte: fechaInicio,
-            lte: fechaFin,
-          },
-        },
-        orderBy: {
-          fechaCompra: 'desc',
-        },
-        include: {
-          proveedor: true,
-        },
-      });
-      return compras.map((c) => ({
-        codCompra: c.codCompra,
-        rucProveedor: c.rucProveedor || '',
-        razonSocial: c.proveedor?.razonSocial || '',
-        costoTotal: c.costoTotal,
-        fechaCompra: c.fechaCompra.toISOString().split('T')[0],
-      }));
-    }
-
     async obtenerMontoCompras(filtro: {
       desde?: string;
       hasta?: string;
@@ -99,7 +89,7 @@ export class CompraService{
         where.fechaCompra = {
           gte: desde,
           lte: hasta,
-        };
+        }; 
       }
 
       if (filtro?.ruc) {

@@ -8,37 +8,46 @@ import { ActualizarProveedorInput } from "./actualizar-proveedor.input";
 export class ProveedorService {
     constructor(private prisma: PrismaService) {}
 
-    async obtenerProveedores(): Promise<Proveedor[]> {
-        return this.prisma.proveedor.findMany();
+    async obtenerProveedores(filtro?: {
+        ruc?: string;
+        razon?: string;
+    }): Promise<Proveedor[]> {
+        let where: any = {};
+
+        if (filtro?.ruc) {
+            where.rucProveedor = filtro.ruc;
+        }
+        if (filtro?.razon) {
+            where.razonSocial = filtro.razon;
+        }
+        
+        const resultado = await this.prisma.proveedor.findMany({
+            where,
+        });
+
+        return resultado;
     }
 
-    async obtenerConteoProveedores() {
+    async obtenerConteoProveedores(filtro?: {
+        ruc?: string;
+        razon?: string;
+    }) {
+        let where: any = {};
+
+        if (filtro?.ruc) {
+            where.rucProveedor = filtro.ruc;
+        }
+        if (filtro?.razon) {
+            where.razonSocial = filtro.razon;
+        }
+
         const resultado = await this.prisma.proveedor.aggregate({
             _count: {
                 rucProveedor: true,
             },
+            where,
         });
         return Number(resultado._count.rucProveedor) || 0;
-    }
-
-    async obtenerProveedoresPorRUC(rucProveedor: string): Promise<Proveedor | null> {
-        return this.prisma.proveedor.findFirst({
-            where: {
-                rucProveedor: {
-                    equals: rucProveedor,
-                }
-            }
-        });
-    }
-
-    async obtenerProveedoresPorRazonSocial(razonSocial: string): Promise<Proveedor | null> {
-        return this.prisma.proveedor.findFirst({
-            where: {
-                razonSocial: {
-                    equals: razonSocial,
-                }
-            }
-        });
     }
 
     async crearProveedor(

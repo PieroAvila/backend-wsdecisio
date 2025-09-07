@@ -10,6 +10,9 @@ export class Mantenimiento {
   codMaquinaria: string;
 
   @Field()
+  maquina: string;
+
+  @Field()
   fechaInicio: string;
 
   @Field({ nullable: true })

@@ -14,6 +14,9 @@ export class Actividad {
   dniPersonal: string;
 
   @Field()
+  encargado: string;
+
+  @Field()
   tipoActividad: string;
 
   @Field()

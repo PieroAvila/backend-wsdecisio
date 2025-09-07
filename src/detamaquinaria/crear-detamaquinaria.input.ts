@@ -1,0 +1,15 @@
+import { Field, InputType } from "@nestjs/graphql";
+import { IsInt, IsNotEmpty } from "class-validator";
+
+@InputType()
+export class CrearDetaMaquinariaInput {
+    @Field()
+    @IsNotEmpty({ message: 'El ID del detaproyecto es requerido' })
+    @IsInt({ message: 'EL ID debe ser un numerop entero' })
+    idDetaProyecto: number;
+
+    @Field()
+    @IsNotEmpty({ message: 'El ID de la maquinaria es requerido' })
+    @IsInt({ message: 'El ID debe ser un número entero' })
+    idMaquinaria: number;
+}

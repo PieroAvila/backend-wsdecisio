@@ -9,27 +9,19 @@ export class ProveedorResolver {
     constructor(private readonly proveedorService: ProveedorService) {}
 
     @Query(() => [Proveedor])
-    async obtenerProveedores() {
-        return this.proveedorService.obtenerProveedores();
+    async obtenerProveedores(
+        @Args('ruc', { nullable: true }) ruc?: string,
+        @Args('razon', { nullable: true }) razon?: string,
+    ) {
+        return this.proveedorService.obtenerProveedores({ ruc, razon});
     }
 
     @Query(() => Int)
-    async obtenerConteoProveedores() {
-        return this.proveedorService.obtenerConteoProveedores();
-    }
-
-    @Query(() => Proveedor, { nullable: true })
-    async obtenerProveedorPorRUC(
-        @Args('rucProveedor') rucProveedor: string,
+    async obtenerConteoProveedores(
+        @Args('ruc', { nullable: true }) ruc?: string,
+        @Args('razon', { nullable: true }) razon?: string,
     ) {
-        return this.proveedorService.obtenerProveedoresPorRUC(rucProveedor);
-    }
-
-    @Query(() => Proveedor, { nullable: true })
-    async obtenerProveedorPorRazonSocial(
-        @Args('razonSocial') razonSocial: string,
-    ) {
-        return this.proveedorService.obtenerProveedoresPorRazonSocial(razonSocial);
+        return this.proveedorService.obtenerConteoProveedores({ruc, razon});
     }
 
     @Mutation(() => Boolean)
@@ -49,7 +41,7 @@ export class ProveedorResolver {
     }
 
     @Mutation(() => Boolean)
-    async borrarPersonal(
+    async borrarProveedor(
         @Args('rucProveedor') rucProveedor: string,
     ) {
         await this.proveedorService.borrarProveedor(rucProveedor);

@@ -10,7 +10,20 @@ import { ActualizarUsuarioInput } from "./actualizar-usuario.input";
 export class UsuarioService {
     constructor(private prisma: PrismaService) {}
 
-    async obtenerUsuarios(): Promise<UsuarioData[]> {
+    async obtenerUsuarios(filtro?: {
+        usuario?: string;
+        dni?: string;
+    }): Promise<UsuarioData[]> {
+        let where: any = {};
+
+        if (filtro?.usuario) {
+            where.usuario = filtro.usuario;
+        }
+
+        if (filtro?.dni) {
+            where.dniPersonal = filtro.dni;
+        }
+
         const usuarios = await this.prisma.usuario.findMany({
             include: {
                 personal: {
@@ -19,6 +32,7 @@ export class UsuarioService {
                     },
                 },
             },
+            where,
         });
         return usuarios.map((u) => ({
             usuario: u.usuario,
@@ -29,35 +43,26 @@ export class UsuarioService {
         }));
     }
 
-    async obtenerConteoUsuarios() {
+    async obtenerConteoUsuarios(filtro?: {
+        usuario?: string;
+        dni?: string;
+    }) {
+        let where: any = {};
+
+        if (filtro?.usuario) {
+            where.usuario = filtro.usuario;
+        }
+
+        if (filtro?.dni) {
+            where.dniPersonal = filtro.dni;
+        }
         const resultado = await this.prisma.usuario.aggregate({
             _count: {
                 usuario: true,
             },
+            where,
         });
         return Number(resultado._count.usuario) || 0;
-    }
-
-    async obtenerUsuarioPorDNI(dniPersonal: string): Promise<UsuarioData[]> {
-        const usuarios = await this.prisma.usuario.findMany({
-            where: {
-                dniPersonal: dniPersonal,
-            },
-            include: {
-                personal: {
-                    include: {
-                        cargo: true,
-                    }
-                }
-            }
-        });
-        return usuarios.map((u) => ({
-            usuario: u.usuario,
-            clave: u.clave,
-            dniPersonal: u.dniPersonal,
-            nombre: u.personal?.nombre || '',
-            cargo: u.personal?.cargo?.cargo ?? '',
-        }))
     }
 
     async crearUsuario(
@@ -75,16 +80,28 @@ export class UsuarioService {
         const personalExistente = await this.prisma.personal.findUnique({
             where: { dniPersonal },
         });
+        const usuarioConPersonal = await this.prisma.usuario.findUnique({
+            where: {dniPersonal},
+        });
+
         if (usuarioExistente) {
             throw new HttpException(
                 'El usuario ya existe en la base de datos',
                 HttpStatus.CONFLICT,
             );
         }
+
         if (!personalExistente) {
             throw new HttpException(
                 'Personal no encontrado',
                 HttpStatus.NOT_FOUND,
+            );
+        }
+
+        if (usuarioConPersonal) {
+            throw new HttpException(
+                'El personal ya cuenta con un usuario',
+                HttpStatus.CONFLICT,
             );
         }
         try {

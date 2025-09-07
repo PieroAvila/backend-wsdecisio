@@ -9,13 +9,17 @@ export class CargoResolver {
   constructor(private readonly cargoService: CargoService) {}
 
   @Query(() => [Cargo])
-  async obtenerCargos() {
-    return this.cargoService.obtenerCargos();
+  async obtenerCargos(
+    @Args('cargo', { nullable: true }) cargo?: string,
+  ) {
+    return this.cargoService.obtenerCargos({ cargo });
   }
 
   @Query(() => Int)
-  async obtenerConteoCargos() {
-    return this.cargoService.obtenerConteoCargos();
+  async obtenerConteoCargos(
+    @Args('cargo', { nullable: true }) cargo?: string,
+  ) {
+    return this.cargoService.obtenerConteoCargos({ cargo });
   }
 
   @Query(() => String, { nullable: true })
@@ -28,11 +32,6 @@ export class CargoResolver {
     @Args('cargo', { nullable: true }) cargo?: string,
   ) {
     return this.cargoService.obtenerMontoTotalHora(cargo);
-  }
-
-  @Query(() => Cargo, { nullable: true })
-  async obtenerCargoPorNombre(@Args('cargo') cargo: string) {
-    return this.cargoService.obtenerCargoPorNombre(cargo);
   }
 
   @Mutation(() => Boolean)
