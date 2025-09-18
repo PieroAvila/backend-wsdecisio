@@ -41,8 +41,10 @@ export class MaterialResolver {
     @Mutation(() => Boolean)
     async borrarMaterial(
         @Args('codMaterial') codMaterial: string,
-    ) {
-        await this.materialService.borrarMaterial(codMaterial);
+        @Args('cantidad', { type: () => Int }) cantidad: number,
+    ): Promise<boolean> {
+        await this.materialService.borrarMaterial(codMaterial, cantidad);
         return true;
     }
+
 }

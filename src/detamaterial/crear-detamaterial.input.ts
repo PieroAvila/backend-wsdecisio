@@ -3,6 +3,13 @@ import { IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, Min } from "class-v
 
 @InputType()
 export class CrearDetaMaterialInput {
+
+    @Field()
+    @IsNotEmpty({ message: 'El ID del detalle es requerido'})
+    @IsInt({ message: 'El ID debe ser un numero entero'})
+    @Min(1, { message: 'El ID no debe ser un numero negativo'})
+    idDetaMaterial: number;
+
     @Field(() => Int)
     @IsInt({ message: 'El ID debe ser un numero entero'})
     idDetaProyecto: number;

@@ -100,6 +100,7 @@ export class ActividadService {
         input: CrearActividadInput,
     ): Promise<void> {
         const {
+            idActividad,
             codProyecto,
             dniPersonal,
             tipoActividad,
@@ -138,6 +139,7 @@ export class ActividadService {
         try {
             await this.prisma.actividad.create({
                 data: {
+                    idActividad,
                     codProyecto,
                     dniPersonal,
                     tipoActividad,

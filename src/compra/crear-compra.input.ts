@@ -4,12 +4,6 @@ import { IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, Length, Match
 @InputType()
 export class CrearCompraInput {
     @Field()
-    @IsNotEmpty({ message: 'El codigo de compra es requerido' })
-    @IsString({ message: 'El codigo de compra debe ser una cadena de texto' })
-    @MaxLength(10, { message: 'El codigo compra debe tener maximo 10 caracteres' })
-    codCompra: string;
-
-    @Field()
     @IsNotEmpty({ message: 'El ruc del proveedor es requerido' })
     @IsString({ message: 'El ruc debe ser una cadena de texto' })
     @Length(11,11, { message: 'El ruc debe tener 11 digitos' })

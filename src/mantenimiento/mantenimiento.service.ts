@@ -58,6 +58,7 @@ export class MantenimientoService {
             desde?: string;
             hasta?: string;
             maquinaria?: number;
+            estado?: string;
         }
     ): Promise<number> {
         let where: any = {};
@@ -77,6 +78,10 @@ export class MantenimientoService {
             where.idMaquinaria = filtro.maquinaria;
         }
 
+        if (filtro?.estado) {
+          where.estado = filtro.estado;
+      }
+
         const resultado = await this.prisma.mantenimiento.aggregate({
             _count: {
                 idMantenimiento: true,
@@ -86,10 +91,31 @@ export class MantenimientoService {
         return Number(resultado._count.idMantenimiento) || 0;
     }
 
+    async obtenerEstadosDisponibles(): Promise<string[]> {
+      const mantenimientos = await this.prisma.mantenimiento.findMany({
+        select: { estado: true },
+        distinct: ['estado'],
+      });
+      return mantenimientos.map((m) => m.estado);
+    }
+
+    async generarIdentificador(): Promise<number> {
+      try {
+        const ultimo = await this.prisma.mantenimiento.findFirst({
+          orderBy: { idMantenimiento: 'desc' },
+          select: { idMantenimiento: true }
+        });
+        const nuevoId = (ultimo?.idMantenimiento ?? 0) + 1;
+        return nuevoId;
+      } catch (error) {
+        throw new Error(`Error generando el identificador`);
+      }
+    }
+
     async crearMantenimiento(
         input: CrearMantenimientoInput,
       ): Promise<void> {
-        const { idMaquinaria, fechaInicio, fechaFin, estado } = input;
+        const { idMantenimiento ,idMaquinaria, fechaInicio, fechaFin, estado } = input;
       
         const maquinariaExistente = await this.prisma.maquinaria.findFirst({
           where: { idMaquinaria },
@@ -112,6 +138,7 @@ export class MantenimientoService {
         try {
           await this.prisma.mantenimiento.create({
             data: {
+              idMantenimiento,
               idMaquinaria,
               fechaInicio: new Date(fechaInicio),
               fechaFin: fechaFin ? new Date(fechaFin) : null,
@@ -125,7 +152,7 @@ export class MantenimientoService {
           await this.prisma.maquinaria.update({
             where: { idMaquinaria },
             data: {
-              estado: 'NO DISPONIBLE',
+              estado: 'EN MANTENIMIENTO',
             },
           });
         } catch (error) {

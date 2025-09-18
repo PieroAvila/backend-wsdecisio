@@ -10,8 +10,13 @@ export class ProyectoResolver {
     constructor(private readonly proyectoService: ProyectoService) {}
     
     @Query(() => [Proyecto])
-    async obtenerProyectos(): Promise<ProyectoData[]> {
-        return this.proyectoService.obtenerProyectos();
+    async obtenerProyectos(
+        @Args('desde', { nullable: true }) desde?: string,
+        @Args('hasta', { nullable: true }) hasta?: string,
+        @Args('cliente', { nullable: true }) cliente?: string,
+        @Args('estado', { nullable: true }) estado?: string,
+    ): Promise<ProyectoData[]> {
+        return this.proyectoService.obtenerProyectos({ desde, hasta, cliente, estado});
     }
 
     @Query(() => Int)
@@ -29,16 +34,9 @@ export class ProyectoResolver {
         @Args('desde', { nullable: true }) desde?: string,
         @Args('hasta', { nullable: true }) hasta?: string,
         @Args('cliente', { nullable: true }) cliente?: string,
+        @Args('estado', { nullable: true }) estado?: string,
     ): Promise<number> {
-        return this.proyectoService.obtenerMontoTotal({ desde, hasta, cliente });
-    }
-
-    @Query(() => [Proyecto])
-    async obtenerProyectosPorFecha(
-        @Args('desde') desde: string,
-        @Args('hasta') hasta: string,
-    ): Promise<ProyectoData[]> {
-        return this.proyectoService.obtenerProyectosPorFecha({ desde, hasta });
+        return this.proyectoService.obtenerMontoTotal({ desde, hasta, cliente, estado });
     }
 
     @Query(() => [String])

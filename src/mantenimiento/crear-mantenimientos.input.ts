@@ -4,6 +4,12 @@ import { IsDateString, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, Min }
 @InputType()
 export class CrearMantenimientoInput {
     @Field()
+    @IsNotEmpty({ message: 'El ID del mantenimiento es requerido'})
+    @IsInt({ message: 'El ID debe ser un numero entero'})
+    @Min(1, { message: 'El ID no debe ser un numero negativo'})
+    idMantenimiento: number;
+
+    @Field()
     @IsNotEmpty({ message: 'La maquinaria es requerida' })
     @IsInt({ message: 'La maquinaria debe ser un numero entero' })
     @Min(1, { message: 'El numero de maquinaria no debe ser un valor negativo' })

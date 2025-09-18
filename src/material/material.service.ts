@@ -34,7 +34,6 @@ export class MaterialService {
         if (filtro?.codigo) {
             where.codMaterial = filtro.codigo;
         }
-
         const resultado = await this.prisma.material.aggregate({
             _sum: {
                 cantidad: true,
@@ -94,18 +93,30 @@ export class MaterialService {
         });
     }
 
-    async borrarMaterial(codMaterial: string): Promise<void> {
-        const materiales = await this.prisma.material.findMany({
+    async borrarMaterial(codMaterial: string, cantidad: number): Promise<void> {
+        const material = await this.prisma.material.findUnique({
             where: { codMaterial },
         });
-        if (materiales.length === 0) {
+    
+        if (!material) {
             throw new HttpException(
-                `El material con codigo ${codMaterial} no existe en la base de datos`,
+                `El material con código ${codMaterial} no existe en la base de datos`,
                 HttpStatus.NOT_FOUND,
             );
         }
-        await this.prisma.material.deleteMany({
+    
+        if (material.cantidad < cantidad) {
+            throw new HttpException(
+                `No puedes borrar ${cantidad} unidades, solo hay ${material.cantidad} disponibles`,
+                HttpStatus.BAD_REQUEST,
+            );
+        }
+    
+        await this.prisma.material.update({
             where: { codMaterial },
-        })
+            data: {
+                cantidad: material.cantidad - cantidad,
+            },
+        });
     }
 }

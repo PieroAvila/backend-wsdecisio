@@ -3,6 +3,7 @@ import { IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, Min } from "class-v
 
 @InputType()
 export class CrearMaquinariaInput {
+
     @Field()
     @IsNotEmpty({ message: 'El codigo de maquinaria es requerido' })
     @IsString({ message: 'El codigo debe ser una cadena de texto' })

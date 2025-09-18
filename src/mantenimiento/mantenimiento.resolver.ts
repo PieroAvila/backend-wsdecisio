@@ -13,7 +13,7 @@ export class MantenimientoResolver {
     async obtenerMantenimientos(
         @Args('desde', { nullable: true }) desde?: string,
         @Args('hasta', { nullable: true }) hasta?: string,
-        @Args('maquinaria', { nullable: true }) maquinaria?: number,
+        @Args('maquinaria', { nullable: true, type: () => Int }) maquinaria?: number,
         @Args('estado', { nullable: true }) estado?: string,
     ): Promise<MantenimientoData[]> {
         return this.mantenimientoService.obtenerMantenimiento({ desde, hasta, maquinaria, estado });
@@ -23,9 +23,20 @@ export class MantenimientoResolver {
     async obtenerConteoMantenimientos(
         @Args('desde', { nullable: true }) desde?: string,
         @Args('hasta', { nullable: true }) hasta?: string,
-        @Args('maquinaria', { nullable: true }) maquinaria?: number,
+        @Args('maquinaria', { nullable: true, type: () => Int }) maquinaria?: number,
+        @Args('estado', { nullable: true }) estado?: string,
     ): Promise<number> {
-        return this.mantenimientoService.obtenerConteoMantenimientos({ desde, hasta, maquinaria });
+        return this.mantenimientoService.obtenerConteoMantenimientos({ desde, hasta, maquinaria, estado });
+    }
+
+    @Query(() => [String])
+    async obtenerEstadosDisponibles() {
+        return this.mantenimientoService.obtenerEstadosDisponibles();
+    }
+
+    @Query(() => Int)
+    async obtenerIdentificadorMantenimiento(): Promise<number> {
+        return this.mantenimientoService.generarIdentificador();
     }
 
     @Mutation(() => Boolean)
@@ -38,7 +49,7 @@ export class MantenimientoResolver {
 
     @Mutation(() => [Mantenimiento])
     async actualizarMantenimiento(
-        @Args('idMantenimiento') idMantenimiento: number,
+        @Args('idMantenimiento', {type: () => Int}) idMantenimiento: number,
         @Args('data') data: ActualizarMantenimientoInput,
     ) {
         return this.mantenimientoService.actualizarMantenimiento(idMantenimiento, data);
@@ -46,7 +57,7 @@ export class MantenimientoResolver {
 
     @Mutation(() => Boolean)
     async borrarMantenimiento(
-        @Args('idMantenimiento') idMantenimiento: number,
+        @Args('idMantenimiento', {type: () => Int}) idMantenimiento: number,
     ) {
         await this.mantenimientoService.borrarMantenimiento(idMantenimiento);
         return true;

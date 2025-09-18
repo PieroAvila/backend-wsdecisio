@@ -19,8 +19,24 @@ export class MaquinariaResolver {
     @Query(() => Int)
     async obtenerConteoMaquinarias(
         @Args('codigo', { nullable: true }) codigo?: string,
+        @Args('estado', { nullable: true }) estado?: string,
     ): Promise<number> {
-        return this.maquinariaService.obtenerConteoMaquinarias({ codigo });
+        return this.maquinariaService.obtenerConteoMaquinarias({ codigo, estado });
+    }
+
+    @Query(() => Int)
+    async obtenerIdentificadorMaquinaria(): Promise<number> {
+        return this.maquinariaService.generarIdentificador();
+    }
+
+    @Query(() => [String])
+    async obtenerCodigoMaquinaria() {
+        return this.maquinariaService.obtenerCodigoMaquinaria();
+    }
+
+    @Query(() => [String])
+    async obtenerEstados() {
+        return this.maquinariaService.obtenerEstados();
     }
 
     @Mutation(() => Boolean)
@@ -33,7 +49,7 @@ export class MaquinariaResolver {
 
     @Mutation(() => Maquinaria)
     async actualizarMaquinaria(
-        @Args('idMaquinaria') idMaquinaria: number,
+        @Args('idMaquinaria', { type: () => Int}) idMaquinaria: number,
         @Args('data') data: ActualizarMaquinariaInput,
     ) {
         return this.maquinariaService.actualizarMaquinaria(idMaquinaria, data)
@@ -41,7 +57,7 @@ export class MaquinariaResolver {
 
     @Mutation(() => Boolean)
     async borrarMaquinaria(
-        @Args('idMaquinaria') idMaquinaria: number,
+        @Args('idMaquinaria', { type: () => Int}) idMaquinaria: number,
     ) {
         await this.maquinariaService.borrarMaquinaria(idMaquinaria);
         return true;

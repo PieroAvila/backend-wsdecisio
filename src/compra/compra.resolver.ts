@@ -35,11 +35,6 @@ export class CompraResolver {
       return this.compraService.obtenerMontoCompras({ desde, hasta, ruc });
     }
 
-    @Query(() => [String])
-    async obtenerProveedoresDisponibles() {
-      return this.compraService.obtenerProveedoresDisponibles();
-    }
-
     @Query(() => Int)
     async obtenerProveedoresActivos() {
       return this.compraService.obtenerProveedoresActivos();
@@ -48,6 +43,16 @@ export class CompraResolver {
     @Query(() => Int)
     async obtenerProveedoresInactivos() {
       return this.compraService.obtenerProveedoresInactivos();
+    }
+
+    @Query(() => String)
+    async obtenerSiguienteCodigoCompra(): Promise<string> {
+      return this.compraService.obtenerSiguienteCodigo();
+    }
+
+    @Query(() => String)
+    async obtenerUltimaCompra(): Promise<string | null> {
+      return this.compraService.obtenerUltimaCompra();
     }
 
     @Mutation(() => Boolean)

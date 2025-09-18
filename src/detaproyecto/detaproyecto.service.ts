@@ -29,6 +29,7 @@ export class DetaProyectoService {
     ): Promise<void> {
         const {
             codProyecto,
+            idDetaProyecto,
         } = input;
         const proyectoExistente = await this.prisma.proyecto.findFirst({
             where: { codProyecto },
@@ -42,6 +43,7 @@ export class DetaProyectoService {
         try {
             await this.prisma.detaProyecto.create({
                 data: {
+                    idDetaProyecto,
                     codProyecto,
                 },
             });

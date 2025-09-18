@@ -70,6 +70,7 @@ export class DetaMaquinariaService {
         input: CrearDetaMaquinariaInput,
     ): Promise<void> {
         const {
+            idDetaMaquinaria,
             idDetaProyecto,
             idMaquinaria,
         } = input;
@@ -86,6 +87,7 @@ export class DetaMaquinariaService {
         try {
             await this.prisma.detaMaquinaria.create({
                 data: {
+                    idDetaMaquinaria,
                     idDetaProyecto,
                     idMaquinaria,
                 }

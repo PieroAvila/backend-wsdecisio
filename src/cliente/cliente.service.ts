@@ -8,33 +8,46 @@ import { ActualizarClienteInput } from "./actualizar-cliente.input";
 export class ClienteService {
     constructor(private prisma: PrismaService) {}
 
-    async obtenerClientes(): Promise<Cliente[]> {
-        return await this.prisma.cliente.findMany();
+    async obtenerClientes(filtro?: {
+        dni?: string;
+        nombre?: string;
+    }): Promise<Cliente[]> {
+        let where: any = {};
+
+        if (filtro?.dni) {
+            where.dniCliente = filtro.dni;
+        }
+
+        if (filtro?.nombre) {
+            where.nombre = filtro.nombre;
+        }
+
+        return await this.prisma.cliente.findMany({
+            where,
+        });
     }
 
-    async obtenerConteoClientes() {
+    async obtenerConteoClientes(filtro?: {
+        dni?: string;
+        nombre?: string;
+    }) {
+        let where: any = {};
+
+        if (filtro?.dni) {
+            where.dniCliente = filtro.dni;
+        }
+
+        if (filtro?.nombre) {
+            where.nombre = filtro.nombre;
+        }
+
         const resultado = await this.prisma.cliente.aggregate({
             _count: {
                 dniCliente: true,
             },
+            where,
         });
         return Number(resultado._count.dniCliente) || 0;
-    }
-
-    async obtenerClientesPorDNI(dniCliente: string): Promise<Cliente[]> {
-        return await this.prisma.cliente.findMany({
-            where: {
-                dniCliente: dniCliente,
-            }
-        });
-    }
-
-    async obtenerClientesPorNombre(nombre: string): Promise<Cliente[]> {
-        return await this.prisma.cliente.findMany({
-            where: {
-                nombre: nombre,
-            }
-        });
     }
 
     async crearCliente(

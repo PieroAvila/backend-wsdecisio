@@ -8,11 +8,38 @@ import { ActualizarProyectoInput } from "./actualizar-proyecto.input";
 export class ProyectoService {
     constructor(private readonly prisma: PrismaService) {}
     
-    async obtenerProyectos(): Promise<ProyectoData[]> {
+    async obtenerProyectos(filtro?: {
+        desde?: string;
+        hasta?: string;
+        cliente?: string;
+        estado?: string;
+    }): Promise<ProyectoData[]> {
+        let where: any = {};
+
+        if (filtro?.desde && filtro?.hasta) {
+            const desde = new Date(filtro.desde);
+            const hasta = new Date(filtro.hasta);
+            hasta.setHours(23, 59, 59, 999);
+
+            where.fechaInicio = {
+                gte: desde,
+                lte: hasta,
+            };
+        }
+
+        if (filtro?.cliente) {
+            where.dniCliente = filtro.cliente;
+        }
+
+        if (filtro?.estado) {
+            where.estado = filtro.estado;
+        }
+
         const proyectos = await this.prisma.proyecto.findMany({
             include: {
                 cliente: true,
             },
+            where,
         });
 
         return proyectos.map((p) => ({
@@ -68,6 +95,7 @@ export class ProyectoService {
             desde?: string;
             hasta?: string;
             cliente?: string;
+            estado?: string;
         }
     ): Promise<number> {
         let where: any = {};
@@ -87,6 +115,11 @@ export class ProyectoService {
             where.dniCliente = filtro.cliente;
         }
 
+        if (filtro?.estado) {
+            where.estado = filtro.estado;
+        }
+
+
         const resultado = await this.prisma.proyecto.aggregate({
             _sum: {
                 costoProyecto: true,
@@ -94,42 +127,6 @@ export class ProyectoService {
             where,
         });
         return Number(resultado._sum.costoProyecto) || 0;
-    }
-
-    async obtenerProyectosPorFecha(
-        filtro: {
-            desde: string;
-            hasta: string;
-        }
-    ): Promise<ProyectoData[]> {
-        const fechaInicial = new Date(filtro.desde);
-        const fechaFin = new Date(filtro.hasta);
-        fechaFin.setHours(23, 59, 59, 999);
-
-        const proyectos = await this.prisma.proyecto.findMany({
-            where: {
-                fechaInicio: {
-                    gte: fechaInicial,
-                    lte: fechaFin,
-                },
-            },
-            orderBy: {
-                fechaInicio: 'desc',
-            },
-            include: {
-                cliente: true,
-            }
-        });
-        return proyectos.map((p) => ({
-            codProyecto: p.codProyecto,
-            nombreProyecto: p.nombreProyecto,
-            dniCliente: p.dniCliente,
-            nombre: p.cliente?.nombre || '',
-            fechaInicio: p.fechaInicio.toISOString().split('T')[0],
-            fechaFin: p.fechaFin.toISOString().split('T')[0],
-            estado: p.estado,
-            costoProyecto: p.costoProyecto,
-        }));
     }
 
     async obtenerClientesDisponibles(): Promise<string[]> {

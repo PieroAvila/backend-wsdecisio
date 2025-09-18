@@ -31,8 +31,13 @@ export class MaquinariaService {
 
     async obtenerConteoMaquinarias(filtro?: {
         codigo?: string;
+        estado?: string;
     }): Promise<number> {
         let where: any = {};
+
+        if (filtro?.estado) {
+            where.estado = filtro.estado;
+        }
 
         if (filtro?.codigo) {
             where.codMaquinaria = filtro.codigo;
@@ -48,36 +53,62 @@ export class MaquinariaService {
         return Number(resultado._count.idMaquinaria) ?? 0;
     }
 
+    async obtenerCodigoMaquinaria(): Promise<string[]> {
+        const maquinarias = await this.prisma.maquinaria.findMany({
+            select: {codMaquinaria: true },
+            distinct: ['codMaquinaria'],
+            orderBy: { codMaquinaria: 'desc' }
+        });
+        return maquinarias.map((ma) => ma.codMaquinaria);
+    }
+
+    async obtenerEstados(): Promise<string[]> {
+        const estados = await this.prisma.maquinaria.findMany({
+            select: { estado: true},
+            distinct: ['estado'],
+            orderBy: { estado: 'desc'}
+        });
+        return estados.map((es) => es.estado);
+    }
+
+    async generarIdentificador(): Promise<number> {
+        try {
+            const ultimo = await this.prisma.maquinaria.findFirst({
+                orderBy: { idMaquinaria: 'desc'},
+                select: { idMaquinaria: true }
+            });
+
+            const nuevoId = (ultimo?.idMaquinaria ?? 0) + 1;
+            return nuevoId;
+        } catch (error) {
+            throw new Error(`Error generando el identificador`);
+        }
+    }
+
     async crearMaquinaria(
         input: CrearMaquinariaInput,
     ): Promise<void> {
         const { codMaquinaria, descripcion, cantidad, estado } = input;
-        const maquinariaExistente = await this.prisma.maquinaria.findMany({
-            where: { codMaquinaria, descripcion },
+        let ultimoId = (await this.prisma.maquinaria.findFirst({
+            orderBy: { idMaquinaria: 'desc' },
+            select: { idMaquinaria: true },
+        }))?.idMaquinaria ?? 0;
+    
+        const nuevasUnidades = Array.from({ length: cantidad }, () => {
+            ultimoId++;
+            return {
+                idMaquinaria: ultimoId,
+                codMaquinaria,
+                descripcion,
+                estado: estado ?? 'DISPONIBLE',
+            };
         });
-
-        if (maquinariaExistente.length > 0) {
-            const nuevasUnidades = Array.from({ length: cantidad }, () => ({
-                codMaquinaria,
-                descripcion,
-                estado,
-            }));
-
-            await this.prisma.maquinaria.createMany({
-                data: nuevasUnidades,
-            })
-        } else {
-            const nuevasUnidades = Array.from({ length: cantidad }, () => ({
-                codMaquinaria,
-                descripcion,
-                estado,
-            }));
-
-            await this.prisma.maquinaria.createMany({
-                data: nuevasUnidades,
-            })
-        }
+    
+        await this.prisma.maquinaria.createMany({
+            data: nuevasUnidades,
+        });
     }
+    
 
     async actualizarMaquinaria(
         idMaquinaria: number,

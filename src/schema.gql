@@ -176,29 +176,30 @@ type Query {
   obtenerEdadesDisponibles: [Int!]!
   obtenerUsuarios(usuario: String, dni: String): [Usuario!]!
   obtenerConteoUsuarios(usuario: String, dni: String): Int!
-  obtenerClientes: [Cliente!]!
-  obtenerConteoClientes: Int!
-  obtenerClientesPorDNI(dniCliente: String!): [Cliente!]!
-  obtenerClientesPorNombre(nombre: String!): [Cliente!]!
+  obtenerClientes(dni: String, nombre: String): [Cliente!]!
+  obtenerConteoClientes(dni: String, nombre: String): Int!
   obtenerProveedores(ruc: String, razon: String): [Proveedor!]!
   obtenerConteoProveedores(ruc: String, razon: String): Int!
   obtenerCompras(desde: String, hasta: String, ruc: String): [Compra!]!
   obtenerConteoCompras(desde: String, hasta: String, ruc: String): Int!
   obtenerMontoCompras(desde: String, hasta: String, ruc: String): Float!
-  obtenerProveedoresDisponibles: [String!]!
   obtenerProveedoresActivos: Int!
   obtenerProveedoresInactivos: Int!
-  obtenerDetalleCompra: [DetalleCompra!]!
-  obtenerConteoDetallePorCompra(codigo: String): Int!
-  obtenerComprasDisponibles: [String!]!
+  obtenerSiguienteCodigoCompra: String!
+  obtenerUltimaCompra: String!
+  obtenerDetalleCompra(codigo: String): [DetalleCompra!]!
+  obtenerConteoDetalles(codigo: String): Int!
+  obtenerIdentificador: Int!
   obtenerMaquinarias(estado: String, codigo: String): [Maquinaria!]!
-  obtenerConteoMaquinarias(codigo: String): Int!
+  obtenerConteoMaquinarias(codigo: String, estado: String): Int!
+  obtenerIdentificadorMaquinaria: Int!
+  obtenerCodigoMaquinaria: [String!]!
+  obtenerEstados: [String!]!
   obtenerMateriales(codigo: String): [Material!]!
   obtenerConteoMateriales(codigo: String): Int!
-  obtenerProyectos: [Proyecto!]!
+  obtenerProyectos(desde: String, hasta: String, cliente: String, estado: String): [Proyecto!]!
   obtenerConteoProyectos(desde: String, hasta: String, cliente: String, estado: String): Int!
-  obtenerMontoTotalProyecto(desde: String, hasta: String, cliente: String): Float!
-  obtenerProyectosPorFecha(desde: String!, hasta: String!): [Proyecto!]!
+  obtenerMontoTotalProyecto(desde: String, hasta: String, cliente: String, estado: String): Float!
   obtenerClientesDisponibles: [String!]!
   obtenerPromedioProyectosPorCliente: Float!
   obtenerConteoDetaProyecto(proyecto: String!): Int!
@@ -213,8 +214,10 @@ type Query {
   obtenerActividades(proyecto: String, personal: String, estado: String): [Actividad!]!
   obtenerConteoActividades(proyecto: String, personal: String, estado: String): Int!
   obtenerConteoActividadesFinalizadas(personal: String): Int!
-  obtenerMantenimientos(desde: String, hasta: String, maquinaria: Float, estado: String): [Mantenimiento!]!
-  obtenerConteoMantenimientos(desde: String, hasta: String, maquinaria: Float): Int!
+  obtenerMantenimientos(desde: String, hasta: String, maquinaria: Int, estado: String): [Mantenimiento!]!
+  obtenerConteoMantenimientos(desde: String, hasta: String, maquinaria: Int, estado: String): Int!
+  obtenerEstadosDisponibles: [String!]!
+  obtenerIdentificadorMantenimiento: Int!
 }
 
 type Mutation {
@@ -236,14 +239,14 @@ type Mutation {
   crearCompra(data: CrearCompraInput!): Boolean!
   borrarCompra(codCompra: String!): Boolean!
   crearDetaCompra(data: CrearDetaCompraInput!): Boolean!
-  actualizarDetalleCompra(idDetalle: Int!, data: ActualizarDetaCompraInput!): [DetalleCompra!]!
-  borrarDetalleCompra(idDetalle: Float!): Boolean!
+  actualizarDetalleCompra(idDetalle: Int!, data: ActualizarDetaCompraInput!): DetalleCompra!
+  borrarDetalleCompra(idDetalle: Int!): Boolean!
   crearMaquinaria(data: CrearMaquinariaInput!): Boolean!
-  actualizarMaquinaria(idMaquinaria: Float!, data: ActualizarMaquinariaInput!): Maquinaria!
-  borrarMaquinaria(idMaquinaria: Float!): Boolean!
+  actualizarMaquinaria(idMaquinaria: Int!, data: ActualizarMaquinariaInput!): Maquinaria!
+  borrarMaquinaria(idMaquinaria: Int!): Boolean!
   crearMaterial(data: CrearMaterialInput!): Boolean!
   actualizarMaterial(codMaterial: String!, data: ActualizarMaterialInput!): Material!
-  borrarMaterial(codMaterial: String!): Boolean!
+  borrarMaterial(codMaterial: String!, cantidad: Int!): Boolean!
   crearProyecto(data: CrearProyectoInput!): Boolean!
   actualizarProyecto(codProyecto: String!, data: ActualizarProyectoInput!): [Proyecto!]!
   borrarProyecto(codProyecto: String!): Boolean!
@@ -258,8 +261,8 @@ type Mutation {
   actualizarActividad(idActividad: Float!, data: ActualizarActividadInput!): [Actividad!]!
   borrarActividad(idActividad: Float!): Boolean!
   crearMantenimiento(data: CrearMantenimientoInput!): Boolean!
-  actualizarMantenimiento(idMantenimiento: Float!, data: ActualizarMantenimientoInput!): [Mantenimiento!]!
-  borrarMantenimiento(idMantenimiento: Float!): Boolean!
+  actualizarMantenimiento(idMantenimiento: Int!, data: ActualizarMantenimientoInput!): [Mantenimiento!]!
+  borrarMantenimiento(idMantenimiento: Int!): Boolean!
 }
 
 input CrearCargoInput {
@@ -326,13 +329,13 @@ input ActualizarProveedorInput {
 }
 
 input CrearCompraInput {
-  codCompra: String!
   rucProveedor: String!
   costoTotal: Float
   fechaCompra: String!
 }
 
 input CrearDetaCompraInput {
+  idDetalle: Float!
   codCompra: String!
   codigo: String!
   descripcion: String!
@@ -388,10 +391,12 @@ input ActualizarProyectoInput {
 }
 
 input CrearDetaProyectoInput {
+  idDetaProyecto: Float!
   codProyecto: String!
 }
 
 input CrearDetaMaterialInput {
+  idDetaMaterial: Float!
   idDetaProyecto: Int!
   codMaterial: String!
   cantidad: Int!
@@ -404,11 +409,13 @@ input ActualizarDetaMaterialInput {
 }
 
 input CrearDetaMaquinariaInput {
+  idDetaMaquinaria: Float!
   idDetaProyecto: Float!
   idMaquinaria: Float!
 }
 
 input CrearActividadInput {
+  idActividad: Float!
   codProyecto: String!
   dniPersonal: String!
   tipoActividad: String!
@@ -425,6 +432,7 @@ input ActualizarActividadInput {
 }
 
 input CrearMantenimientoInput {
+  idMantenimiento: Float!
   idMaquinaria: Float!
   fechaInicio: String!
   fechaFin: String

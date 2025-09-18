@@ -124,6 +124,7 @@ export class DetaMaterialService {
         input: CrearDetaMaterialInput,
     ): Promise<void> {
         const {
+            idDetaMaterial,
             idDetaProyecto,
             codMaterial,
             cantidad,
@@ -165,6 +166,7 @@ export class DetaMaterialService {
         try {
             await this.prisma.detaMaterial.create({
                 data: {
+                    idDetaMaterial,
                     idDetaProyecto,
                     codMaterial,
                     cantidad,

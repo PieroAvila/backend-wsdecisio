@@ -9,27 +9,19 @@ export class ClienteResolver {
     constructor(private readonly clienteService: ClienteService) {}
 
     @Query(() => [Cliente])
-    async obtenerClientes(): Promise<Cliente[]> {
-        return this.clienteService.obtenerClientes();
+    async obtenerClientes(
+        @Args('dni', {nullable: true}) dni?: string,
+        @Args('nombre', {nullable: true}) nombre?: string,
+    ): Promise<Cliente[]> {
+        return this.clienteService.obtenerClientes({dni, nombre});
     }
 
     @Query(() => Int)
-    async obtenerConteoClientes() {
-        return this.clienteService.obtenerConteoClientes();
-    }
-
-    @Query(() => [Cliente])
-    async obtenerClientesPorDNI(
-        @Args('dniCliente') dniCliente: string,
+    async obtenerConteoClientes(
+        @Args('dni', {nullable: true}) dni?: string,
+        @Args('nombre', {nullable: true}) nombre?: string,
     ) {
-        return this.clienteService.obtenerClientesPorDNI(dniCliente);
-    }
-
-    @Query(() => [Cliente])
-    async obtenerClientesPorNombre(
-        @Args('nombre') nombre: string,
-    ) {
-        return this.clienteService.obtenerClientesPorNombre(nombre);
+        return this.clienteService.obtenerConteoClientes({dni, nombre});
     }
 
     @Mutation(() => Boolean)

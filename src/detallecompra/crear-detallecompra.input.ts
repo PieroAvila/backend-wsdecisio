@@ -4,6 +4,12 @@ import { IsIn, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, Min
 @InputType()
 export class CrearDetaCompraInput {
     @Field()
+    @IsNotEmpty({ message: 'El ID del detalle es requerido'})
+    @IsInt({ message: 'El ID debe ser un numero entero'})
+    @Min(1, { message: 'El ID no debe ser un numero negativo'})
+    idDetalle: number;
+
+    @Field()
     @IsNotEmpty({ message: 'El codigo de compra es requerido' })
     @IsString({ message: 'El codigo de compra debe ser una cadena de texto' })
     @MaxLength(10, { message: 'El codigo compra debe tener maximo 10 caracteres' })

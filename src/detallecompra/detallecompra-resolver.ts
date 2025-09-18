@@ -10,20 +10,22 @@ export class DetaCompraResolver {
     constructor(private readonly detacompraService: DetaCompraService) {}
     
     @Query(() => [DetalleCompra])
-    async obtenerDetalleCompra(): Promise<DetalleCompraData[]> {
-        return this.detacompraService.obtenerDetalleCompra();
+    async obtenerDetalleCompra(
+        @Args('codigo', { nullable: true}) codigo?: string,
+    ): Promise<DetalleCompraData[]> {
+        return this.detacompraService.obtenerDetalleCompra({ codigo });
     }
 
     @Query(() => Int)
-    async obtenerConteoDetallePorCompra(
+    async obtenerConteoDetalles(
         @Args('codigo', { nullable: true }) codigo?: string,
     ): Promise<number> {
         return this.detacompraService.obtenerConteoDetalles({ codigo });
     }
 
-    @Query(() => [String])
-    async obtenerComprasDisponibles() {
-        return this.detacompraService.obtenerComprasDisponibles();
+    @Query(() => Int)
+    async obtenerIdentificador(): Promise<number> {
+        return this.detacompraService.generarIdentificador();
     }
 
     @Mutation(() => Boolean)
@@ -34,17 +36,17 @@ export class DetaCompraResolver {
         return true;
     }
     
-    @Mutation(() => [DetalleCompra])
-    async actualizarDetalleCompra(
-        @Args('idDetalle', { type: () => Int }) idDetalle: number,
-        @Args('data') data: ActualizarDetaCompraInput,
-    ): Promise<DetalleCompraData[]> {
-        return this.detacompraService.actualizarDetalleCompra(idDetalle,data)
-    }
+    @Mutation(() => DetalleCompra)
+  async actualizarDetalleCompra(
+    @Args('idDetalle', { type: () => Int }) idDetalle: number,
+    @Args('data') data: ActualizarDetaCompraInput,
+  ) {
+    return this.detacompraService.actualizarDetalleCompra(idDetalle, data);
+  }
 
     @Mutation(() => Boolean)
     async borrarDetalleCompra(
-        @Args('idDetalle') idDetalle: number,
+        @Args('idDetalle', { type: () => Int}) idDetalle: number,
     ) {
         await this.detacompraService.borrarDetalleCompra(idDetalle);
         return true;

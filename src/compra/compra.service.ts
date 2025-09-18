@@ -106,17 +106,6 @@ export class CompraService{
       return Number(resultado._sum.costoTotal) || 0;
     }
 
-    async obtenerProveedoresDisponibles(): Promise<string[]> {
-      const proveedores = await this.prisma.proveedor.findMany({
-        select: {
-          rucProveedor: true,
-        },
-        distinct: ['rucProveedor']
-      });
-
-      return proveedores.map((p) => p.rucProveedor)
-    }
-
     async obtenerProveedoresActivos(): Promise<number> {
       return this.prisma.proveedor.count({
         where: {
@@ -137,30 +126,46 @@ export class CompraService{
       })
     }
 
+    async obtenerSiguienteCodigo(): Promise<string> {
+      const codigo = await this.prisma.compra.findFirst({
+        orderBy: { codCompra: 'desc' }
+      });
+
+      if (!codigo) {
+        return "CMA-00001";
+      }
+
+      const ultimoNumero = parseInt(codigo.codCompra.split('-')[1], 10);
+      const siguienteNumero = ultimoNumero + 1;
+
+      return `CMA-${siguienteNumero.toString().padStart(5, '0')}`;
+    }
+
+    async obtenerUltimaCompra(): Promise<string | null> {
+      const ultima = await this.prisma.compra.findFirst({
+        orderBy: { codCompra: 'desc' },
+        select: { codCompra: true }
+      });
+
+      return ultima ? ultima.codCompra: null;
+    }
+
     async crearCompra(
       input: CrearCompraInput,
     ): Promise<void> {
       const {
-        codCompra,
         rucProveedor,
         costoTotal,
         fechaCompra,
       } = input;
-
-      const codigoExistente = await this.prisma.compra.findFirst({
-        where: { codCompra },
-      });
-
-      if (codigoExistente) {
-        throw new HttpException(
-          'El codigo de compra ya existe en la base de datos',
-          HttpStatus.CONFLICT,
-        );
-      }
+      
       try {
+
+        const nuevoCodigo = await this.obtenerSiguienteCodigo();
+
         await this.prisma.compra.create({
           data: {
-            codCompra,
+            codCompra: nuevoCodigo,
             rucProveedor,
             costoTotal,
             fechaCompra: new Date(fechaCompra),
