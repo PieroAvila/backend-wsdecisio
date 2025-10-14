@@ -33,7 +33,8 @@ export class ActividadService {
             include: {
                 proyecto: true,
                 personal: true,
-            }
+            },
+            where,
         });
         return actividades.map((a) => ({
             idActividad: a.idActividad,

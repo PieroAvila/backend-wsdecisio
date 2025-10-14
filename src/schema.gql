@@ -107,14 +107,16 @@ type Proyecto {
 type Actividad {
   idActividad: Int!
   codProyecto: String!
+  proyecto: String!
   dniPersonal: String!
+  personal: String!
   encargado: String!
   tipoActividad: String!
   estado: String!
   duracionEstimada: Int!
   duracionReal: Int
-  proyecto: Proyecto!
-  personal: Personal!
+  proyectos: Proyecto!
+  personales: Personal!
 }
 
 type Usuario {

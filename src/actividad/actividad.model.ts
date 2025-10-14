@@ -11,7 +11,13 @@ export class Actividad {
   codProyecto: string;
 
   @Field()
+  proyecto: string;
+
+  @Field()
   dniPersonal: string;
+
+  @Field()
+  personal: string;
 
   @Field()
   encargado: string;
@@ -29,8 +35,8 @@ export class Actividad {
   duracionReal?: number;
 
   @Field(() => Proyecto)
-  proyecto: Proyecto;
+  proyectos: Proyecto;
 
   @Field(() => Personal)
-  personal: Personal;
+  personales: Personal;
 }
