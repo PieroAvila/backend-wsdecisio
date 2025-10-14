@@ -79,23 +79,25 @@ export class ActividadService {
     }
 
     async obtenerConteoActividadesCompletadas(
-        filtro?: {
-            personal?: string;
-        }
-    ) {
-        let where: any = {};
-
-        if (filtro?.personal) {
-            where.dniPersonal = filtro.personal;
-        }
-        return this.prisma.actividad.count({
-            where: {
-                duracionReal: {
-                    not: null,
-                }
-            }
-        });
-    }
+      filtro?: {
+          personal?: string;
+      }
+  ) {
+      let where: any = {
+          duracionReal: {
+              not: null,
+          },
+      };
+  
+      if (filtro?.personal) {
+          where.dniPersonal = filtro.personal;
+      }
+  
+      return this.prisma.actividad.count({
+          where,
+      });
+  }
+  
 
     async obtenerEstados(): Promise<string[]> {
       const actividades = await this.prisma.actividad.findMany({
