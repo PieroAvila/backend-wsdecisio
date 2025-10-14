@@ -8,20 +8,20 @@ datasource db {
 }
 
 model Cargo {
-  idCargo  Int        @id @default(autoincrement())
-  cargo    String
-  pagoHora Decimal
-  personal Personal[]
+  idCargo   Int        @id @default(autoincrement())
+  cargo     String     @db.VarChar(60)
+  pagoHora  Float      @db.Money
+  personal  Personal[]
 }
 
 model Personal {
-  dniPersonal String      @id @db.Char(8)
+  dniPersonal String      @id @db.VarChar(8)
   nombre      String      @db.VarChar(60)
   apellido    String      @db.VarChar(60)
   edad        Int
   correo      String      @db.VarChar(60)
-  telefono    String      @db.Char(9)
-  cuentaBcp   String      @db.Char(14)
+  telefono    String      @db.VarChar(9)
+  cuentaBcp   String      @db.VarChar(14)
   idCargo     Int?
   cargo       Cargo?      @relation(fields: [idCargo], references: [idCargo], onDelete: SetNull)
   usuario     Usuario?
@@ -31,93 +31,122 @@ model Personal {
 model Usuario {
   usuario     String    @id @db.VarChar(20)
   clave       String    @db.VarChar(100)
-  dniPersonal String    @unique @db.Char(8)
-  personal    Personal? @relation(fields: [dniPersonal], references: [dniPersonal], onDelete: Cascade)
+  dniPersonal String    @unique @db.VarChar(8)
+  personal    Personal  @relation(fields: [dniPersonal], references: [dniPersonal], onDelete: Cascade)
+}
+
+model TipoCliente {
+  idTipoCliente Int       @id @default(autoincrement())
+  tipoCliente   String    @db.VarChar(20)
+  clientes      Cliente[]
 }
 
 model Cliente {
-  dniCliente String     @id @db.Char(8)
-  nombre     String     @db.VarChar(60)
-  correo     String     @db.VarChar(60)
-  telefono   String     @db.Char(9)
-  proyecto   Proyecto[]
+  dniCliente   String        @id @db.VarChar(8)
+  nombre       String        @db.VarChar(60)
+  apellido     String        @db.VarChar(60)
+  idTipoCliente Int
+  tipoCliente  TipoCliente   @relation(fields: [idTipoCliente], references: [idTipoCliente], onDelete: Cascade)
+  ruc          String?       @db.VarChar(11)
+  razonSocial  String?       @db.VarChar(100)
+  proyectos    Proyecto[]
 }
 
 model Proveedor {
-  rucProveedor String   @id @db.Char(11)
-  razonSocial  String   @db.VarChar(100)
-  cuentaBcp    String   @db.Char(14)
-  Compra       Compra[]
+  rucProveedor String      @id @db.VarChar(11)
+  razonSocial  String      @db.VarChar(100)
+  cuentaBcp    String      @db.VarChar(14)
+  compras      Compra[]
+}
+
+model Comprobante {
+  idComprobante Int        @id @default(autoincrement())
+  comprobante   String     @db.VarChar(20)
+  compras       Compra[]
+}
+
+model Condicion {
+  idCondicion Int         @id @default(autoincrement())
+  condicion   String      @db.VarChar(20)
+  proyectos   Proyecto[]
+}
+
+model Proyecto {
+  codProyecto     String        @id @db.VarChar(8)
+  nombreProyecto  String        @db.VarChar(255)
+  dniCliente      String        @db.VarChar(8)
+  cliente         Cliente       @relation(fields: [dniCliente], references: [dniCliente], onDelete: Cascade)
+  fechaInicio     DateTime      @db.Date
+  diasProgramados Int
+  fechaFin        DateTime?     @db.Date
+  estado          String        @default("en planificacion") @db.VarChar(20)
+  idCondicion     Int
+  condicion       Condicion     @relation(fields: [idCondicion], references: [idCondicion], onDelete: Cascade)
+  costoProyecto   Float?        @db.Money
+  compras         Compra[]
+  detaProyecto    DetaProyecto?
+  actividades     Actividad[]
 }
 
 model Compra {
-  codCompra     String         @id @db.Char(10)
-  rucProveedor  String?        @db.Char(11)
-  proveedor     Proveedor?     @relation(fields: [rucProveedor], references: [rucProveedor], onDelete: Cascade)
-  costoTotal    Decimal?
-  fechaCompra   DateTime
-  detalleCompra DetalleCompra?
+  codCompra      String        @id @db.VarChar(10)
+  idComprobante  Int
+  comprobante    Comprobante   @relation(fields: [idComprobante], references: [idComprobante], onDelete: Cascade)
+  rucProveedor   String
+  proveedor      Proveedor     @relation(fields: [rucProveedor], references: [rucProveedor], onDelete: Cascade)
+  costoTotal     Float?        @db.Money
+  codProyecto    String?
+  proyecto       Proyecto?     @relation(fields: [codProyecto], references: [codProyecto], onDelete: SetNull)
+  fechaCompra    DateTime      @db.Date
+  detalleCompra  DetalleCompra?
 }
 
 model DetalleCompra {
-  idDetalle   Int     @id
-  codCompra   String  @unique @db.Char(10)
-  compra      Compra? @relation(fields: [codCompra], references: [codCompra], onDelete: Cascade)
-  codigo      String  @db.Char(10)
-  descripcion String  @db.VarChar(255)
-  categoria   String  @db.Char(20)
-  cantidad    Int
-  estado      String  @default("DISPONIBLE") @db.Char(20)
-  unidadMedida String @db.VarChar(20)
-  precioUnit Decimal
+  idDetalle    Int        @id
+  codCompra    String     @unique @db.VarChar(10)
+  compra       Compra     @relation(fields: [codCompra], references: [codCompra], onDelete: Cascade)
+  codigo       String     @db.VarChar(10)
+  descripcion  String     @db.VarChar(255)
+  categoria    String     @db.VarChar(20)
+  cantidad     Int
+  estado       String     @default("disponible") @db.VarChar(20)
+  unidadMedida String     @db.VarChar(20)
+  precioUnit   Float      @db.Money
 }
 
 model Maquinaria {
   idMaquinaria   Int              @id
-  codMaquinaria  String           @db.Char(10)
+  codMaquinaria  String           @db.VarChar(10)
   descripcion    String           @db.VarChar(255)
-  estado         String           @default("DISPONIBLE") @db.Char(20)
+  estado         String           @default("disponible") @db.VarChar(20)
   detaMaquinaria DetaMaquinaria[]
   mantenimiento  Mantenimiento[]
 }
 
 model Material {
-  codMaterial  String         @id @db.Char(10)
+  codMaterial  String         @id @db.VarChar(10)
   descripcion  String         @db.VarChar(255)
   cantidad     Int
-  unidadMedida String         @db.Char(20)
+  unidadMedida String         @db.VarChar(20)
   detaMaterial DetaMaterial[]
-}
-
-model Proyecto {
-  codProyecto   String        @id @db.Char(7)
-  nombreProyecto        String        @db.VarChar(255)
-  dniCliente    String        @db.Char(8)
-  cliente       Cliente       @relation(fields: [dniCliente], references: [dniCliente], onDelete: Cascade)
-  fechaInicio   DateTime
-  fechaFin      DateTime
-  estado        String        @default("EN PLANIFICACION") @db.Char(20)
-  costoProyecto Decimal
-  detaProyecto  DetaProyecto?
-  actividad     Actividad[]
 }
 
 model DetaProyecto {
   idDetaProyecto Int              @id
-  codProyecto    String           @unique @db.Char(7)
-  proyecto       Proyecto?        @relation(fields: [codProyecto], references: [codProyecto], onDelete: Cascade)
+  codProyecto    String           @unique @db.VarChar(8)
+  proyecto       Proyecto         @relation(fields: [codProyecto], references: [codProyecto], onDelete: Cascade)
   detaMaterial   DetaMaterial[]
   detaMaquinaria DetaMaquinaria[]
 }
 
 model DetaMaterial {
-  idDetaMaterial  Int          @id
-  idDetaProyecto  Int
-  detaProyecto    DetaProyecto @relation(fields: [idDetaProyecto], references: [idDetaProyecto], onDelete: Cascade)
-  codMaterial     String       @db.Char(10)
-  material        Material     @relation(fields: [codMaterial], references: [codMaterial], onDelete: Cascade)
-  cantidad        Int
-  cantidadUsada   Int?
+  idDetaMaterial   Int          @id
+  idDetaProyecto   Int
+  detaProyecto     DetaProyecto @relation(fields: [idDetaProyecto], references: [idDetaProyecto], onDelete: Cascade)
+  codMaterial      String       @db.VarChar(10)
+  material         Material     @relation(fields: [codMaterial], references: [codMaterial], onDelete: Cascade)
+  cantidad         Int
+  cantidadUsada    Int?
   cantidadRestante Int?
 }
 
@@ -125,28 +154,27 @@ model DetaMaquinaria {
   idDetaMaquinaria Int          @id
   idDetaProyecto   Int
   detaProyecto     DetaProyecto @relation(fields: [idDetaProyecto], references: [idDetaProyecto], onDelete: Cascade)
-  idMaquinaria    Int      
+  idMaquinaria     Int
   maquinaria       Maquinaria   @relation(fields: [idMaquinaria], references: [idMaquinaria], onDelete: Cascade)
 }
 
 model Actividad {
-  idActividad      Int      @id
-  codProyecto      String   @db.Char(7)
-  proyecto         Proyecto @relation(fields: [codProyecto], references: [codProyecto], onDelete: Cascade)
-  dniPersonal      String   @db.Char(8)
-  personal         Personal @relation(fields: [dniPersonal], references: [dniPersonal], onDelete: Cascade)
-  tipoActividad    String   @db.VarChar(50)
-  descripcion      String   @db.VarChar(255)
-  estado           String   @default("NO INICIADO") @db.Char(20)
+  idActividad      Int        @id
+  codProyecto      String     @db.VarChar(8)
+  proyecto         Proyecto   @relation(fields: [codProyecto], references: [codProyecto], onDelete: Cascade)
+  dniPersonal      String     @db.VarChar(8)
+  personal         Personal   @relation(fields: [dniPersonal], references: [dniPersonal], onDelete: Cascade)
+  tipoActividad    String     @db.VarChar(50)
+  estado           String     @default("no iniciado") @db.VarChar(20)
   duracionEstimada Int
   duracionReal     Int?
 }
 
 model Mantenimiento {
   idMantenimiento Int        @id
-  idMaquinaria    Int     
+  idMaquinaria    Int
   maquinaria      Maquinaria @relation(fields: [idMaquinaria], references: [idMaquinaria], onDelete: Cascade)
-  fechaInicio     DateTime
-  fechaFin        DateTime?
-  estado          String     @db.Char(20)
+  fechaInicio     DateTime   @db.Date
+  fechaFin        DateTime?  @db.Date
+  estado          String     @db.VarChar(20)
 }

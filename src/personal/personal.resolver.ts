@@ -4,7 +4,6 @@ import { PersonalService } from "./personal.service";
 import { PersonalData } from "./personal.interface";
 import { CrearPersonalInput } from "./crear-personal.input";
 import { ActualizarPersonalInput } from "./actualizar-personal.input";
-import { Cargo } from "src/cargo/cargo.model";
 
 @Resolver(() => Personal)
 export class PersonalResolver {

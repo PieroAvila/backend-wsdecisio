@@ -18,6 +18,9 @@ import { DetaMaterialModule } from './detamaterial/detamaterial.module';
 import { DetaMaquinariaModule } from './detamaquinaria/detamaquinaria.module';
 import { ActividadModule } from './actividad/actividad.module';
 import { MantenimientoModule } from './mantenimiento/mantenimiento.module';
+import { TipoClienteModule } from './tipocliente/tipocliente.module';
+import { ComprobanteModule } from './comprobante/comprobante.module';
+import { CondicionModule } from './condicion/condicion.module';
 
 @Module({
   imports: [
@@ -32,13 +35,16 @@ import { MantenimientoModule } from './mantenimiento/mantenimiento.module';
     CargoModule,
     PersonalModule,
     UsuarioModule,
+    TipoClienteModule,
     ClienteModule,
     ProveedorModule,
+    ComprobanteModule,
+    CondicionModule,
+    ProyectoModule,
     CompraModule,
     DetaCompraModule,
     MaquinariaModule,
     MaterialModule,
-    ProyectoModule,
     DetaProyectoModule,
     DetaMaterialModule,
     DetaMaquinariaModule,

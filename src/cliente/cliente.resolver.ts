@@ -3,6 +3,7 @@ import { Cliente } from "./cliente.model";
 import { ClienteService } from "./cliente.service";
 import { CrearClienteInput } from "./crear-cliente.input";
 import { ActualizarClienteInput } from "./actualizar-cliente.input";
+import { ClienteData } from "./cliente.interface";
 
 @Resolver(() => Cliente)
 export class ClienteResolver {
@@ -12,7 +13,7 @@ export class ClienteResolver {
     async obtenerClientes(
         @Args('dni', {nullable: true}) dni?: string,
         @Args('nombre', {nullable: true}) nombre?: string,
-    ): Promise<Cliente[]> {
+    ): Promise<ClienteData[]> {
         return this.clienteService.obtenerClientes({dni, nombre});
     }
 
@@ -37,7 +38,7 @@ export class ClienteResolver {
         @Args('dniCliente') dniCliente: string,
         @Args('data') data: ActualizarClienteInput,
     ) {
-        return this.clienteService.actualizarCLiente(dniCliente,data);
+        return this.clienteService.actualizarCliente(dniCliente,data);
     }
 
     @Mutation(() => Boolean)

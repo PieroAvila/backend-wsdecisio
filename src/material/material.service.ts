@@ -10,11 +10,16 @@ export class MaterialService {
     
     async obtenerMateriales(filtro?: {
         codigo?: string;
+        medida?: string;
     }) {
         let where: any = {};
 
         if (filtro?.codigo) {
             where.codMaterial = filtro.codigo;
+        }
+
+        if (filtro?.medida) {
+            where.unidadMedida = filtro.medida;
         }
 
         const materiales = await this.prisma.material.findMany({
@@ -27,6 +32,7 @@ export class MaterialService {
     async obtenerConteoMateriales(
         filtro?: {
             codigo?: string;
+            medida?: string;
         }
     ): Promise<number> {
         let where: any = {};
@@ -34,6 +40,11 @@ export class MaterialService {
         if (filtro?.codigo) {
             where.codMaterial = filtro.codigo;
         }
+        
+        if (filtro?.medida) {
+            where.unidadMedida = filtro.medida;
+        }
+
         const resultado = await this.prisma.material.aggregate({
             _sum: {
                 cantidad: true,
@@ -41,6 +52,15 @@ export class MaterialService {
             where,
         });
         return Number(resultado._sum.cantidad) ?? 0;
+    }
+
+    async obtenerMedidas(): Promise<string[]> {
+        const medidas = await this.prisma.material.findMany({
+            select: { unidadMedida: true },
+            distinct: ['unidadMedida'],
+            orderBy: { unidadMedida: 'desc' }
+        });
+        return medidas.map((me) => me.unidadMedida);
     }
 
     async crearMaterial(

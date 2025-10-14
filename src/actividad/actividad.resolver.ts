@@ -34,6 +34,11 @@ export class ActividadResolver {
         return this.actividadService.obtenerConteoActividadesCompletadas({ personal });
     }
 
+    @Query(() => [String])
+    async obtenerEstadosActividad() {
+        return this.actividadService.obtenerEstados();
+    }
+
     @Mutation(() => Boolean)
     async crearActividad(
         @Args('data') data: CrearActividadInput,
@@ -44,7 +49,7 @@ export class ActividadResolver {
 
     @Mutation(() => [Actividad])
     async actualizarActividad(
-        @Args('idActividad') idActividad: number,
+        @Args('idActividad', { type: () => Int}) idActividad: number,
         @Args('data') data: ActualizarActividadInput,
     ) {
         return this.actividadService.actualizarActividad(idActividad, data);
@@ -52,7 +57,7 @@ export class ActividadResolver {
 
     @Mutation(() => Boolean)
     async borrarActividad(
-        @Args('idActividad') idActividad: number,
+        @Args('idActividad', { type: () => Int}) idActividad: number,
     ) {
         await this.actividadService.borrarActividad(idActividad);
         return true;

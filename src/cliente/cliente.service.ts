@@ -3,6 +3,7 @@ import { Cliente } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CrearClienteInput } from "./crear-cliente.input";
 import { ActualizarClienteInput } from "./actualizar-cliente.input";
+import { ClienteData } from "./cliente.interface";
 
 @Injectable()
 export class ClienteService {
@@ -11,7 +12,7 @@ export class ClienteService {
     async obtenerClientes(filtro?: {
         dni?: string;
         nombre?: string;
-    }): Promise<Cliente[]> {
+    }): Promise<ClienteData[]> {
         let where: any = {};
 
         if (filtro?.dni) {
@@ -22,9 +23,21 @@ export class ClienteService {
             where.nombre = filtro.nombre;
         }
 
-        return await this.prisma.cliente.findMany({
+        const clientes = await this.prisma.cliente.findMany({
+            include: {
+                tipoCliente: true,
+            },
             where,
         });
+
+        const clienteData: ClienteData[] = clientes.map((c) => ({
+            dniCliente: c.dniCliente,
+            cliente: c.nombre +" "+ c.apellido,
+            tipoCliente: c.tipoCliente?.tipoCliente,
+            ruc: c.ruc || '',
+            razonSocial: c.razonSocial || '',
+        }));
+        return clienteData;
     }
 
     async obtenerConteoClientes(filtro?: {
@@ -56,8 +69,10 @@ export class ClienteService {
         const {
             dniCliente,
             nombre,
-            correo,
-            telefono,
+            apellido,
+            idTipoCliente,
+            ruc,
+            razonSocial,
         } = input;
         const dniExistente = await this.prisma.cliente.findFirst({
             where: { dniCliente },
@@ -65,27 +80,9 @@ export class ClienteService {
         const dniExistente2 = await this.prisma.personal.findFirst({
             where: { dniPersonal: dniCliente },
         });
-        const correoExistente = await this.prisma.cliente.findFirst({
-            where: { correo },
-        });
-        const telefonoExistente = await this.prisma.cliente.findFirst({
-            where: { telefono },
-        });
         if (dniExistente || dniExistente2) {
             throw new HttpException(
                 'El DNI ya existe en la base de datos',
-                HttpStatus.CONFLICT,
-            );
-        }
-        if (correoExistente) {
-            throw new HttpException(
-                'El correo ya existe en la base de datos',
-                HttpStatus.CONFLICT,
-            );
-        }
-        if (telefonoExistente) {
-            throw new HttpException(
-                'El telefono ya existe en la base de datos',
                 HttpStatus.CONFLICT,
             );
         }
@@ -94,8 +91,10 @@ export class ClienteService {
                 data: {
                     dniCliente,
                     nombre,
-                    correo,
-                    telefono,
+                    apellido,
+                    idTipoCliente,
+                    ruc,
+                    razonSocial,
                 },
             });
         } catch (error) {
@@ -106,7 +105,7 @@ export class ClienteService {
         }
     }
 
-    async actualizarCLiente(
+    async actualizarCliente(
         dniCliente: string,
         input: ActualizarClienteInput,
     ): Promise<Cliente> {

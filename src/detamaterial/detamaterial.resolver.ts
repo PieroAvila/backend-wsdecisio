@@ -4,21 +4,31 @@ import { DetaMaterialService } from "./detamaterial.service";
 import { DetaMaterialData } from "./detamaterial.interface";
 import { CrearDetaMaterialInput } from "./crear-detamaterial.input";
 import { ActualizarDetaMaterialInput } from "./actualizar-detamaterial.input";
+import { DetaProyecto } from "src/detaproyecto/detaproyecto.model";
+import { DetaProyectoData } from "./detaProyectoData.dto";
 
 @Resolver(() => DetaMaterial)
 export class DetaMaterialResolver {
     constructor(private readonly detamaterialService: DetaMaterialService) {}
 
     @Query(() => [DetaMaterial])
-    async obtenerDetaMaterial(): Promise<DetaMaterialData[]> {
-        return this.detamaterialService.obtenerDetaMaterial();
+    async obtenerDetaMaterial(
+        @Args('desde', { nullable: true }) desde?: string,
+        @Args('hasta', { nullable: true }) hasta?: string,
+        @Args('proyecto', { nullable: true }) proyecto?: string,
+        @Args('material', { nullable: true }) material?: string,
+    ): Promise<DetaMaterialData[]> {
+        return this.detamaterialService.obtenerDetaMaterial({ desde, hasta, proyecto, material });
     }
 
     @Query(() => Int)
     async obtenerConteoDetaMateriales(
+        @Args('desde', { nullable: true }) desde?: string,
+        @Args('hasta', { nullable: true }) hasta?: string,
         @Args('proyecto', { nullable: true }) proyecto?: string,
+        @Args('material', { nullable: true }) material?: string,
     ): Promise<number> {
-        return this.detamaterialService.obtenerConteoDetaMateriales({ proyecto });
+        return this.detamaterialService.obtenerConteoDetaMateriales({ desde, hasta, material, proyecto });
     }
 
     @Query(() => Int)
@@ -26,8 +36,9 @@ export class DetaMaterialResolver {
         @Args('desde', { nullable: true }) desde?: string,
         @Args('hasta', { nullable: true }) hasta?: string,
         @Args('proyecto', { nullable: true }) proyecto?: string,
+        @Args('material', { nullable: true }) material?: string,
     ): Promise<number> {
-        return this.detamaterialService.obtenerTotalMaterialUsado({ desde, hasta, proyecto });
+        return this.detamaterialService.obtenerTotalMaterialUsado({ desde, hasta, proyecto, material });
     }
 
     @Query(() => [String])
@@ -35,9 +46,9 @@ export class DetaMaterialResolver {
         return this.detamaterialService.obtenerMaterialesDisponibles();
     }
 
-    @Query(() => [String])
-    async obtenerProyectosDisponibles() {
-        return this.detamaterialService.obtenerProyectosDisponibles();
+    @Query(() => [DetaProyectoData])
+    async obtenerDetaProyecto():Promise<DetaProyectoData[]> {
+        return this.detamaterialService.obtenerDetaProyectos();
     }
 
     @Mutation(() => Boolean)
@@ -50,7 +61,7 @@ export class DetaMaterialResolver {
 
     @Mutation(() => [DetaMaterial])
     async actualizarDetaMaterial(
-        @Args('idDetaMaterial') idDetaMaterial: number,
+        @Args('idDetaMaterial', { type: () => Int}) idDetaMaterial: number,
         @Args('data') data: ActualizarDetaMaterialInput,
     ) {
         return this.detamaterialService.actualizarDetaMaterial(idDetaMaterial, data);
@@ -58,7 +69,7 @@ export class DetaMaterialResolver {
 
     @Mutation(() => Boolean)
     async borrarDetaMaterial(
-        @Args('idDetaMaterial') idDetaMaterial: number,
+        @Args('idDetaMaterial', {type: () => Int}) idDetaMaterial: number,
     ) {
         await this.detamaterialService.borrarDetaMaterial(idDetaMaterial);
         return true;

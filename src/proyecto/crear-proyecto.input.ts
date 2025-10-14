@@ -1,12 +1,12 @@
 import { Field, InputType } from "@nestjs/graphql";
-import { IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, Length, Matches, MaxLength, Min } from "class-validator";
+import { IsDateString, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Length, Matches, Max, MaxLength, Min } from "class-validator";
 
 @InputType()
 export class CrearProyectoInput {
     @Field()
     @IsNotEmpty({ message: 'El codigo es requerido' })
     @IsString({ message: 'El codigo debe ser una cadena de texto' })
-    @Length(7,7, { message: 'El codigo debe tener 7 caracteres' })
+    @Length(8,8, { message: 'El codigo debe tener 8 caracteres' })
     codProyecto: string;
 
     @Field()
@@ -28,15 +28,28 @@ export class CrearProyectoInput {
     fechaInicio: string;
 
     @Field()
-    @IsNotEmpty({ message: 'La fecha fin es requerida' })
+    @IsNotEmpty({ message: 'Los dias programados es requerido' })
+    @IsInt({ message: 'Los dias deben ser un numero entero' })
+    @Min(1, { message: 'La cantidad de dias no pueden ser negativos' })
+    diasProgramados: number;
+
+    @Field({ nullable: true })
+    @IsOptional()
     @IsDateString()
-    fechaFin: string;
+    fechaFin?: string;
 
     @Field({ nullable: true })
     @IsOptional()
     @IsString({ message: 'El estado debe ser una cadena de texto' })
     @MaxLength(20, { message: 'El estado debe tener maximo 20 caracteres' })
     estado?: string;
+
+    @Field()
+    @IsNotEmpty({ message: 'El ID es requerido' })
+    @IsInt({ message: 'El ID debe ser un numero entero' })
+    @Min(1, { message: 'El ID minimo es 1' })
+    @Max(2, { message: 'El ID debe ser menor de 3' })
+    idCondicion: number;
 
     @Field({ nullable: true })
     @IsOptional()

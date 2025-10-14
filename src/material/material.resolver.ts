@@ -10,16 +10,23 @@ export class MaterialResolver {
     
     @Query(() => [Material])
     async obtenerMateriales(
-        @Args('codigo', { nullable: true }) codigo?: string, 
+        @Args('codigo', { nullable: true }) codigo?: string,
+        @Args('medida', { nullable: true }) medida?: string,
     ) {
-        return this.materialService.obtenerMateriales({codigo});
+        return this.materialService.obtenerMateriales({codigo, medida});
     }
 
     @Query(() => Int)
     async obtenerConteoMateriales(
         @Args('codigo', { nullable: true }) codigo?: string,
+        @Args('medida', { nullable: true }) medida?: string,
     ): Promise<number> {
-        return this.materialService.obtenerConteoMateriales({codigo});
+        return this.materialService.obtenerConteoMateriales({codigo, medida });
+    }
+
+    @Query(() => [String])
+    async obtenerMedidas() {
+        return this.materialService.obtenerMedidas();
     }
 
     @Mutation(() => Boolean)

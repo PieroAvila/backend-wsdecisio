@@ -3,6 +3,7 @@ import { Maquinaria } from "./maquinaria.model";
 import { MaquinariaService } from "./maquinaria.service";
 import { CrearMaquinariaInput } from "./crear-maquinaria.input";
 import { ActualizarMaquinariaInput } from "./actualizar-maquinaria.input";
+import { MaquinariaDescripcion } from "./maquinaria.consulta";
 
 @Resolver(() => Maquinaria)
 export class MaquinariaResolver {
@@ -29,14 +30,35 @@ export class MaquinariaResolver {
         return this.maquinariaService.generarIdentificador();
     }
 
-    @Query(() => [String])
-    async obtenerCodigoMaquinaria() {
-        return this.maquinariaService.obtenerCodigoMaquinaria();
+    @Query(() => [MaquinariaDescripcion])
+        async obtenerDescripcionMaquinaria() {
+        return this.maquinariaService.obtenerCodigosYDescripcionMaquinaria();
     }
 
     @Query(() => [String])
-    async obtenerEstados() {
+    async obtenerEstadosMaquinaria() {
         return this.maquinariaService.obtenerEstados();
+    }
+
+    @Query(() => Int)
+    async obtenerMaquinariasEnMantenimiento(
+        @Args('codigo', { nullable: true }) codigo?: string,
+    ): Promise<number> {
+        return this.maquinariaService.obtenerMaquinariasEnMantenimiento({codigo});
+    }
+
+    @Query(() => Int)
+    async obtenerMaquinariasDisponible(
+        @Args('codigo', { nullable: true }) codigo?: string,
+    ): Promise<number> {
+        return this.maquinariaService.obtenerMaquinariasDisponibles({codigo});
+    }
+
+    @Query(() => Int)
+    async obtenerMaquinariasEnUso(
+        @Args('codigo', { nullable: true }) codigo?: string,
+    ): Promise<number> {
+        return this.maquinariaService.obtenerMaquinariasEnUso({codigo});
     }
 
     @Mutation(() => Boolean)

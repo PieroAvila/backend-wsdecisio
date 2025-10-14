@@ -1,12 +1,12 @@
-import { Decimal } from "@prisma/client/runtime/library";
-
 export interface ProyectoData {
     codProyecto: string;
     nombreProyecto: string;
     dniCliente: string;
-    nombre: string;
+    contacto: string;
     fechaInicio: string;
+    diasProgramados: number;
     fechaFin: string;
     estado: string;
-    costoProyecto: Decimal | null;
+    condicion: string;
+    costoProyecto: number | null;
 }

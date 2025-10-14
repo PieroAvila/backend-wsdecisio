@@ -11,6 +11,8 @@ export class CompraService{
       desde?: string;
       hasta?: string;
       ruc?: string;
+      comprobante?: string;
+      proyecto?: string;
     }): Promise<CompraData[]> {
       let where: any = {};
       
@@ -27,18 +29,29 @@ export class CompraService{
       if (filtro?.ruc) {
         where.rucProveedor = filtro.ruc;
       }
+      if (filtro?.comprobante) {
+        where.comprobante = {
+          comprobante: filtro.comprobante,
+        }
+      }
+      if (filtro?.proyecto) {
+        where.codProyecto = filtro.proyecto;
+      }
 
       const compras = await this.prisma.compra.findMany({
           include: {
                 proveedor: true,
+                comprobante: true,
             },
             where,
         });
         return compras.map((c) => ({
             codCompra: c.codCompra,
+            comprobante: c.comprobante?.comprobante || '',
             rucProveedor: c.rucProveedor || '',
             razonSocial: c.proveedor?.razonSocial || '',
             costoTotal: c.costoTotal,
+            codProyecto: c.codProyecto || '',
             fechaCompra: c.fechaCompra.toISOString().split('T')[0],
         }))
     }
@@ -47,6 +60,8 @@ export class CompraService{
       desde?: string;
       hasta?: string;
       ruc?: string;
+      comprobante?: string;
+      proyecto?: string;
     }): Promise<number> {
         let where: any= {};
 
@@ -64,6 +79,14 @@ export class CompraService{
         if (filtro?.ruc) {
           where.rucProveedor = filtro.ruc;
         }
+        if (filtro?.comprobante) {
+          where.comprobante = {
+            comprobante: filtro.comprobante,
+          }
+        }
+        if (filtro?.proyecto) {
+          where.codProyecto = filtro.proyecto;
+        }
 
         const resultado = await this.prisma.compra.aggregate({
           _count: {
@@ -78,6 +101,8 @@ export class CompraService{
       desde?: string;
       hasta?: string;
       ruc?: string;
+      comprobante?: string;
+      proyecto?: string;
     }): Promise<number> {
       const where: any = {};
 
@@ -91,9 +116,16 @@ export class CompraService{
           lte: hasta,
         }; 
       }
-
       if (filtro?.ruc) {
         where.rucProveedor = filtro.ruc;
+      }
+      if (filtro?.comprobante) {
+        where.comprobante = {
+          comprobante: filtro.comprobante,
+        }
+      }
+      if (filtro?.proyecto) {
+        where.codProyecto = filtro.proyecto;
       }
 
       const resultado = await this.prisma.compra.aggregate({
@@ -109,7 +141,7 @@ export class CompraService{
     async obtenerProveedoresActivos(): Promise<number> {
       return this.prisma.proveedor.count({
         where: {
-          Compra: {
+          compras: {
             some: {},
           }
         }
@@ -119,7 +151,7 @@ export class CompraService{
     async obtenerProveedoresInactivos(): Promise<number> {
       return this.prisma.proveedor.count({
         where: {
-          Compra: {
+          compras: {
             none: {},
           }
         }
@@ -132,13 +164,13 @@ export class CompraService{
       });
 
       if (!codigo) {
-        return "CMA-00001";
+        return "CMA-0001";
       }
 
       const ultimoNumero = parseInt(codigo.codCompra.split('-')[1], 10);
       const siguienteNumero = ultimoNumero + 1;
 
-      return `CMA-${siguienteNumero.toString().padStart(5, '0')}`;
+      return `CMA-${siguienteNumero.toString().padStart(4, '0')}`;
     }
 
     async obtenerUltimaCompra(): Promise<string | null> {
@@ -155,7 +187,9 @@ export class CompraService{
     ): Promise<void> {
       const {
         rucProveedor,
+        idComprobante,
         costoTotal,
+        codProyecto,
         fechaCompra,
       } = input;
       
@@ -166,8 +200,10 @@ export class CompraService{
         await this.prisma.compra.create({
           data: {
             codCompra: nuevoCodigo,
+            idComprobante,
             rucProveedor,
             costoTotal,
+            codProyecto,
             fechaCompra: new Date(fechaCompra),
           },
         })

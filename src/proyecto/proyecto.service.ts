@@ -38,6 +38,7 @@ export class ProyectoService {
         const proyectos = await this.prisma.proyecto.findMany({
             include: {
                 cliente: true,
+                condicion: true,
             },
             where,
         });
@@ -46,10 +47,12 @@ export class ProyectoService {
             codProyecto: p.codProyecto,
             nombreProyecto: p.nombreProyecto,
             dniCliente: p.dniCliente,
-            nombre: p.cliente?.nombre || '',
+            contacto: p.cliente?.nombre,
             fechaInicio: p.fechaInicio.toISOString().split('T')[0],
-            fechaFin: p.fechaFin.toISOString().split('T')[0],
+            diasProgramados: p.diasProgramados,
+            fechaFin: p.fechaFin?.toISOString().split('T')[0] || '',
             estado: p.estado,
+            condicion: p.condicion?.condicion,
             costoProyecto: p.costoProyecto,
         }));
     }
@@ -140,6 +143,24 @@ export class ProyectoService {
         return clientes.map((c) => c.dniCliente)
     }
 
+    async obtenerProyectosString(): Promise<string[]> {
+        const proyectos = await this.prisma.proyecto.findMany({
+            select: {
+                nombreProyecto: true,
+            },
+            distinct: ['nombreProyecto']
+        });
+        return proyectos.map((p) => p.nombreProyecto)
+    }
+
+    async obtenerEstados(): Promise<string[]> {
+        const proyectos = await this.prisma.proyecto.findMany({
+            select: { estado: true },
+            distinct: ['estado'],
+        });
+        return proyectos.map((p) => p.estado);
+    }
+
     async obtenerPromedioProyectosPorCliente(): Promise<number> {
         const proyectosPorCliente = await this.prisma.proyecto.groupBy({
             by: ['dniCliente'],
@@ -158,46 +179,68 @@ export class ProyectoService {
 
     async crearProyecto(
         input: CrearProyectoInput,
-    ): Promise<void> {
+      ): Promise<void> {
         const {
-            codProyecto,
-            nombreProyecto,
-            dniCliente,
-            fechaInicio,
-            fechaFin,
-            estado,
-            costoProyecto,
+          codProyecto,
+          nombreProyecto,
+          dniCliente,
+          fechaInicio,
+          diasProgramados,
+          fechaFin,
+          estado,
+          idCondicion,
+          costoProyecto,
         } = input;
-
+      
         const codigoExistente = await this.prisma.proyecto.findFirst({
-            where: { codProyecto },
+          where: { codProyecto },
         });
-
+      
         if (codigoExistente) {
-            throw new HttpException(
-                'El proyecto ya existe en la base de datos',
-                HttpStatus.CONFLICT,
-            );
+          throw new HttpException(
+            'El proyecto ya existe en la base de datos',
+            HttpStatus.CONFLICT,
+          );
         }
+      
         try {
-            await this.prisma.proyecto.create({
-                data: {
-                    codProyecto,
-                    nombreProyecto,
-                    dniCliente,
-                    fechaInicio: new Date(fechaInicio),
-                    fechaFin: new Date(fechaFin),
-                    estado,
-                    costoProyecto: costoProyecto ?? 0
-                },
-            })
+          // Crear proyecto
+          await this.prisma.proyecto.create({
+            data: {
+              codProyecto,
+              nombreProyecto,
+              dniCliente,
+              fechaInicio: new Date(fechaInicio),
+              diasProgramados,
+              fechaFin: fechaFin ? new Date(fechaFin) : null,
+              estado: estado ?? 'No iniciado',
+              idCondicion,
+              costoProyecto: costoProyecto ?? 0,
+            },
+          });
+          
+          const ultimo = await this.prisma.detaProyecto.findFirst({
+            orderBy: { idDetaProyecto: 'desc' },
+            select: { idDetaProyecto: true },
+          });
+      
+          const nuevoId = ultimo ? ultimo.idDetaProyecto + 1 : 1;
+      
+          await this.prisma.detaProyecto.create({
+            data: {
+              idDetaProyecto: nuevoId,
+              codProyecto,
+            },
+          });
+      
         } catch (error) {
-            throw new HttpException(
-                `Error al registrar la compra ${error}`,
-                HttpStatus.INTERNAL_SERVER_ERROR,
-            );
+          throw new HttpException(
+            `Error al registrar el proyecto/detaproyecto: ${error}`,
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
         }
-    }
+      }
+      
 
     async actualizarProyecto(
         codProyecto: string,
@@ -217,8 +260,12 @@ export class ProyectoService {
     
         const proyectoActualizado = await this.prisma.proyecto.update({
             where: { codProyecto },
-            data: { ...input },
-        });
+            data: {
+              ...input,
+              fechaFin: input.fechaFin ? new Date(input.fechaFin) : undefined, // 👈 conversión segura
+            },
+          });
+          
     
         if (input.estado === 'FINALIZADO') {
             await this.prisma.maquinaria.updateMany({
@@ -236,17 +283,19 @@ export class ProyectoService {
         }
     
         const proyectos = await this.prisma.proyecto.findMany({
-            include: { cliente: true },
+            include: { cliente: true, condicion: true },
         });
     
         const ProyectoDatos: ProyectoData[] = proyectos.map((p) => ({
             codProyecto: p.codProyecto,
             nombreProyecto: p.nombreProyecto,
             dniCliente: p.dniCliente,
-            nombre: p.cliente?.nombre || '',
+            contacto: p.cliente?.nombre,
             fechaInicio: p.fechaInicio.toISOString().split('T')[0],
-            fechaFin: p.fechaFin.toISOString().split('T')[0],
+            diasProgramados: p.diasProgramados,
+            fechaFin: p.fechaFin?.toISOString().split('T')[0] || '',
             estado: p.estado,
+            condicion: p.condicion?.condicion,
             costoProyecto: p.costoProyecto,
         }));
     

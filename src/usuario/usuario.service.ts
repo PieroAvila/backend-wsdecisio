@@ -5,6 +5,7 @@ import { CrearUsuarioInput } from "./crear-usuario.input";
 import { Usuario } from "@prisma/client";
 import * as bcrypt from 'bcrypt';
 import { ActualizarUsuarioInput } from "./actualizar-usuario.input";
+import { UsuarioLogin } from "./usuarioLogin.model";
 
 @Injectable()
 export class UsuarioService {
@@ -64,6 +65,25 @@ export class UsuarioService {
         });
         return Number(resultado._count.usuario) || 0;
     }
+
+    async login(usuario: string, clave: string): Promise<UsuarioLogin> {
+        const user = await this.prisma.usuario.findUnique({ where: { usuario } });
+      
+        if (!user) {
+          throw new Error('Usuario no encontrado');
+        }
+      
+        const esValido = await bcrypt.compare(clave, user.clave);
+        if (!esValido) {
+          throw new Error('Clave incorrecta');
+        }
+      
+        return {
+          usuario: user.usuario,
+          dniPersonal: user.dniPersonal,
+        };
+      }
+      
 
     async crearUsuario(
         input: CrearUsuarioInput

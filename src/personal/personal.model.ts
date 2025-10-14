@@ -13,6 +13,9 @@ export class Personal {
 
   @Field()
   apellido: string;
+  
+  @Field()
+  personal: string;
 
   @Field(() => Int)
   edad: number;
@@ -29,8 +32,14 @@ export class Personal {
   @Field(() => Int, { nullable: true})
   idCargo?: number;
 
+  @Field()
+  cargo?: string;
+
+  @Field()
+  pagoHora?: number;
+
   @Field(() => Cargo, { nullable: true })
-  cargo?: Cargo;
+  cargos?: Cargo;
 
   @Field(() => [Usuario], { nullable: true })
   usuarios?: Usuario[];

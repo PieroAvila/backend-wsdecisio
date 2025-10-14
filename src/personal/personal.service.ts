@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
-import { PersonalData } from "./personal.interface";
 import { CrearPersonalInput } from "./crear-personal.input";
 import { Personal } from "@prisma/client";
 import { ActualizarPersonalInput } from "./actualizar-personal.input";
+import { PersonalData } from "./personal.interface";
 
 @Injectable()
 export class PersonalService {
@@ -41,12 +41,14 @@ export class PersonalService {
             dniPersonal: p.dniPersonal,
             nombre: p.nombre,
             apellido: p.apellido,
+            personal: p.nombre + " "+ p.apellido,
             edad: p.edad,
             correo: p.correo,
             telefono: p.telefono,
             cuentaBcp: p.cuentaBcp,
-            idCargo: p.idCargo,
-            cargo: p.cargo,
+            idCargo: p.idCargo || 0,
+            cargo: p.cargo?.cargo || "",
+            pagoHora: p.cargo?.pagoHora || 0,
         }));
     }
 

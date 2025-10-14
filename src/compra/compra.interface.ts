@@ -1,9 +1,9 @@
-import { Decimal } from "@prisma/client/runtime/library";
-
 export interface CompraData {
     codCompra: string;
+    comprobante: string;
     rucProveedor: string;
     razonSocial: string;
-    costoTotal: Decimal | null;
+    costoTotal: number | null;
+    codProyecto: string;
     fechaCompra: string;
 }

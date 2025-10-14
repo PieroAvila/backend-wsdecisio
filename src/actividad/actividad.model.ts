@@ -20,9 +20,6 @@ export class Actividad {
   tipoActividad: string;
 
   @Field()
-  descripcion: string;
-
-  @Field()
   estado: string;
 
   @Field(() => Int)

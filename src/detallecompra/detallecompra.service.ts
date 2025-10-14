@@ -135,7 +135,7 @@ export class DetaCompraService {
             await tx.compra.update({
               where: { codCompra },
               data: {
-                costoTotal: new Decimal(compraExistente.costoTotal ?? 0).add(subtotal),
+                costoTotal: new Decimal(compraExistente.costoTotal ?? 0).add(subtotal).toNumber(),
               },
             });
       
@@ -244,14 +244,14 @@ async actualizarDetalleCompra(
     });
 
     const nuevoCostoTotal = detallesRelacionados.reduce((total, detalle) => {
-      const subtotal = detalle.precioUnit.toNumber() * detalle.cantidad;
+      const subtotal = detalle.precioUnit * detalle.cantidad;
       return total + subtotal;
     }, 0);
 
     await this.prisma.compra.update({
       where: { codCompra: detalleActualizado.codCompra },
       data: {
-        costoTotal: new Decimal(nuevoCostoTotal.toFixed(2)),
+        costoTotal: Number(nuevoCostoTotal.toFixed(2)),
       },
     });
 
@@ -275,7 +275,7 @@ async actualizarDetalleCompra(
         await this.prisma.compra.update({
             where: { codCompra: detalles.codCompra },
             data: {
-                costoTotal: new Decimal(detalles.compra?.costoTotal ?? 0).minus(subtotal),
+                costoTotal: new Decimal(detalles.compra?.costoTotal ?? 0).minus(subtotal).toNumber(),
             },
         });
 

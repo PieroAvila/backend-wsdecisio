@@ -4,6 +4,7 @@ import { UsuarioService } from "./usuario.service";
 import { UsuarioData } from "./usuario.interface";
 import { CrearUsuarioInput } from "./crear-usuario.input";
 import { ActualizarUsuarioInput } from "./actualizar-usuario.input";
+import { UsuarioLogin } from "./usuarioLogin.model";
 
 @Resolver(() => Usuario)
 export class UsuarioResolver {
@@ -23,6 +24,14 @@ export class UsuarioResolver {
         @Args('dni', { nullable: true }) dni?: string,
     ) {
         return this.usuarioService.obtenerConteoUsuarios({usuario, dni});
+    }
+
+    @Mutation(() => UsuarioLogin)
+    async login(
+        @Args('usuario') usuario: string,
+        @Args('clave') clave: string,
+    ): Promise<UsuarioLogin> {
+    return this.usuarioService.login(usuario, clave);
     }
 
     @Mutation(() => Boolean)

@@ -53,14 +53,24 @@ export class MaquinariaService {
         return Number(resultado._count.idMaquinaria) ?? 0;
     }
 
-    async obtenerCodigoMaquinaria(): Promise<string[]> {
+    async obtenerCodigosYDescripcionMaquinaria(): Promise<{ codMaquinaria: string; descripcion: string }[]> {
         const maquinarias = await this.prisma.maquinaria.findMany({
-            select: {codMaquinaria: true },
-            distinct: ['codMaquinaria'],
-            orderBy: { codMaquinaria: 'desc' }
+          select: { codMaquinaria: true, descripcion: true },
+          orderBy: { descripcion: 'asc' },
         });
-        return maquinarias.map((ma) => ma.codMaquinaria);
-    }
+        const mapa = new Map<string, { codMaquinaria: string; descripcion: string }>();
+      
+        for (const m of maquinarias) {
+          const clave = m.descripcion.trim().toLowerCase();
+          if (!mapa.has(clave)) {
+            mapa.set(clave, {
+              codMaquinaria: m.codMaquinaria,
+              descripcion: m.descripcion.trim(),
+            });
+          }
+        }
+        return Array.from(mapa.values());
+      }
 
     async obtenerEstados(): Promise<string[]> {
         const estados = await this.prisma.maquinaria.findMany({
@@ -69,6 +79,39 @@ export class MaquinariaService {
             orderBy: { estado: 'desc'}
         });
         return estados.map((es) => es.estado);
+    }
+
+    async obtenerMaquinariasEnMantenimiento(filtro?: { codigo?: string }): Promise<number> {
+        let where: any = { estado: "EN MANTENIMIENTO" };
+        if (filtro?.codigo) {
+            where.codMaquinaria = filtro.codigo;
+        }
+        const resultado = await this.prisma.maquinaria.count({
+            where,
+        });
+        return resultado;
+    }
+
+    async obtenerMaquinariasDisponibles(filtro?: {codigo?: string }): Promise<number> {
+        let where: any = { estado: "DISPONIBLE" };
+        if (filtro?.codigo) {
+            where.codMaquinaria = filtro.codigo;
+        }
+        const resultado = await this.prisma.maquinaria.count({
+            where,
+        });
+        return resultado;
+    }
+
+    async obtenerMaquinariasEnUso(filtro?: {codigo?: string}): Promise<number> {
+        let where: any = { estado: "EN USO" };
+        if (filtro?.codigo) {
+            where.codMaquinaria = filtro.codigo;
+        }
+        const resultado = await this.prisma.maquinaria.count({
+            where,
+        });
+        return resultado;
     }
 
     async generarIdentificador(): Promise<number> {

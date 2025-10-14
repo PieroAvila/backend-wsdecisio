@@ -3,6 +3,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { DetaMaterialData } from "./detamaterial.interface";
 import { CrearDetaMaterialInput } from "./crear-detamaterial.input";
 import { ActualizarDetaMaterialInput } from "./actualizar-detamaterial.input";
+import { DetaProyectoData } from "./detaproyecto.interface";
 
 @Injectable()
 export class DetaMaterialService {
@@ -10,15 +11,38 @@ export class DetaMaterialService {
 
     async obtenerDetaMaterial(
         filtro?: {
-            proyecto: string;
+            proyecto?: string;
+            material?: string;
+            desde?: string;
+            hasta?: string;
         }
     ): Promise<DetaMaterialData[]> {
         let where: any = {};
 
+        if (filtro?.desde && filtro?.hasta) {
+            const desde = new Date(filtro.desde);
+            const hasta = new Date(filtro.hasta);
+            hasta.setHours(23, 59, 59, 999);
+
+            where.detaProyecto = {
+                ...(where.detaProyecto || {}),
+                proyecto: {
+                    fechaInicio: {
+                        gte: desde,
+                        lte: hasta,
+                    },
+                },
+            };
+        }
+
         if (filtro?.proyecto) {
             where.detaProyecto = {
                 codProyecto: filtro.proyecto,
-            };
+            }
+        }
+
+        if (filtro?.material) {
+            where.codMaterial = filtro.material;
         }
 
         const detamateriales = await this.prisma.detaMaterial.findMany({
@@ -30,8 +54,10 @@ export class DetaMaterialService {
                 },
                 material: true,
             },
+            where,
         });
         return detamateriales.map((dmat) => ({
+            idDetaMaterial: dmat.idDetaMaterial,
             codProyecto: dmat.detaProyecto?.codProyecto,
             codMaterial: dmat.codMaterial,
             descripcion: dmat.material?.descripcion || '',
@@ -44,13 +70,36 @@ export class DetaMaterialService {
 
     async obtenerConteoDetaMateriales(filtro?: {
         proyecto?: string;
+        material?: string;
+        desde?: string;
+        hasta?: string;
     }): Promise<number> {
         let where: any = {};
+
+        if (filtro?.desde && filtro?.hasta) {
+            const desde = new Date(filtro.desde);
+            const hasta = new Date(filtro.hasta);
+            hasta.setHours(23, 59, 59, 999);
+
+            where.detaProyecto = {
+                ...(where.detaProyecto || {}),
+                proyecto: {
+                    fechaInicio: {
+                        gte: desde,
+                        lte: hasta,
+                    },
+                },
+            };
+        }
 
         if (filtro?.proyecto) {
             where.detaProyecto = {
                 codProyecto: filtro.proyecto,
-            };
+            }
+        }
+
+        if (filtro?.material) {
+            where.codMaterial = filtro.material;
         }
         const resultado = await this.prisma.detaMaterial.aggregate({
             _count: {
@@ -112,81 +161,96 @@ export class DetaMaterialService {
         return materiales.map((m) => m.codMaterial);
     }
 
-    async obtenerProyectosDisponibles(): Promise<string[]> {
-        const proyectos = await this.prisma.proyecto.findMany({
-            select: { codProyecto: true },
-            distinct: ['codProyecto'],
+    async obtenerDetaProyectos(): Promise<DetaProyectoData[]> {
+        const detaproyecto = await this.prisma.detaProyecto.findMany({
+            include: {
+                proyecto: true,
+            },
         });
-        return proyectos.map((p) => p.codProyecto);
+        return detaproyecto.map((dp) => ({
+            idDetaProyecto: dp.idDetaProyecto,
+            codProyecto: dp.codProyecto,
+            nombreProyecto: dp.proyecto?.nombreProyecto || '',
+        }));
     }
 
     async crearDetaMaterial(
         input: CrearDetaMaterialInput,
-    ): Promise<void> {
+      ): Promise<void> {
         const {
-            idDetaMaterial,
-            idDetaProyecto,
-            codMaterial,
-            cantidad,
-            cantidadUsada = 0,
+          idDetaProyecto,
+          codMaterial,
+          cantidad,
+          cantidadUsada = 0,
         } = input;
+      
         const detaproyectoExistente = await this.prisma.detaProyecto.findFirst({
-            where: { idDetaProyecto },
+          where: { idDetaProyecto },
         });
         const materialExistente = await this.prisma.material.findFirst({
-            where: { codMaterial },
+          where: { codMaterial },
         });
+      
         if (!detaproyectoExistente) {
-            throw new HttpException(
-                'El detaproyecto no existe en la base de datos',
-                HttpStatus.CONFLICT,
-            );
+          throw new HttpException(
+            'El detaproyecto no existe en la base de datos',
+            HttpStatus.CONFLICT,
+          );
         }
         if (!materialExistente) {
-            throw new HttpException(
-                'El material no existe en la base de datos',
-                HttpStatus.CONFLICT,
-            );
+          throw new HttpException(
+            'El material no existe en la base de datos',
+            HttpStatus.CONFLICT,
+          );
         }
         if (cantidad > materialExistente.cantidad) {
-            throw new HttpException(
-                `Stock insuficiente. Stock actual: ${materialExistente.cantidad}`,
-                HttpStatus.BAD_REQUEST,
-            );
+          throw new HttpException(
+            `Stock insuficiente. Stock actual: ${materialExistente.cantidad}`,
+            HttpStatus.BAD_REQUEST,
+          );
         }
-
         if (cantidadUsada > cantidad) {
-            throw new HttpException(
-                `${cantidadUsada} no puede ser mayor que la cantidad asignada (${cantidad})`,
-                HttpStatus.BAD_REQUEST,
-            );
+          throw new HttpException(
+            `${cantidadUsada} no puede ser mayor que la cantidad asignada (${cantidad})`,
+            HttpStatus.BAD_REQUEST,
+          );
         }
+      
         const cantidadRestante = cantidad - cantidadUsada;
-
+      
         try {
-            await this.prisma.detaMaterial.create({
-                data: {
-                    idDetaMaterial,
-                    idDetaProyecto,
-                    codMaterial,
-                    cantidad,
-                    cantidadUsada,
-                    cantidadRestante,
-                }
-            });
-            await this.prisma.material.update({
-                where: { codMaterial },
-                data: {
-                    cantidad: materialExistente.cantidad - cantidad,
-                },
-            });
+          // Buscar el último idDetaMaterial
+          const ultimo = await this.prisma.detaMaterial.findFirst({
+            orderBy: { idDetaMaterial: 'desc' },
+            select: { idDetaMaterial: true },
+          });
+      
+          const nuevoId = (ultimo?.idDetaMaterial || 0) + 1;
+      
+          await this.prisma.detaMaterial.create({
+            data: {
+              idDetaMaterial: nuevoId,
+              idDetaProyecto,
+              codMaterial,
+              cantidad,
+              cantidadUsada,
+              cantidadRestante,
+            },
+          });
+      
+          await this.prisma.material.update({
+            where: { codMaterial },
+            data: {
+              cantidad: materialExistente.cantidad - cantidad,
+            },
+          });
         } catch (error) {
-            throw new HttpException(
-                `Error al registrar el detalle del material ${error}`,
-                HttpStatus.INTERNAL_SERVER_ERROR,
-            );
+          throw new HttpException(
+            `Error al registrar el detalle del material ${error}`,
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
         }
-    }
+      }      
 
     async actualizarDetaMaterial(
         idDetaMaterial: number,

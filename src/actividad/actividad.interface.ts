@@ -3,7 +3,6 @@ export interface ActividadData {
     dniPersonal: string;
     encargado: string;
     tipoActividad: string;
-    descripcion: string;
     estado: string;
     duracionEstimada: number;
     duracionReal: number;

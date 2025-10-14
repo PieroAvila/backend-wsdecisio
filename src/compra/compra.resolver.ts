@@ -13,8 +13,10 @@ export class CompraResolver {
       @Args('desde', { nullable: true }) desde?: string,
       @Args('hasta', { nullable: true }) hasta?: string,
       @Args('ruc', { nullable: true }) ruc?: string,
+      @Args('comprobante', {nullable: true}) comprobante?: string,
+      @Args('proyecto', { nullable: true }) proyecto?: string,
     ): Promise<CompraData[]> {
-        return this.compraService.obtenerCompras({desde, hasta, ruc});
+        return this.compraService.obtenerCompras({desde, hasta, ruc, comprobante, proyecto });
     }
     
     @Query(() => Int)
@@ -22,8 +24,10 @@ export class CompraResolver {
       @Args('desde', { nullable: true }) desde?: string,
       @Args('hasta', { nullable: true }) hasta?: string,
       @Args('ruc', { nullable: true }) ruc?: string,
+      @Args('comprobante', {nullable: true }) comprobante?: string,
+      @Args('proyecto', { nullable: true }) proyecto?: string,
     ): Promise<number> {
-      return this.compraService.obtenerConteoCompras({ desde, hasta, ruc });
+      return this.compraService.obtenerConteoCompras({ desde, hasta, ruc, comprobante, proyecto });
     }
 
     @Query(() => Float)
@@ -31,8 +35,10 @@ export class CompraResolver {
       @Args('desde', { nullable: true }) desde?: string,
       @Args('hasta', { nullable: true }) hasta?: string,
       @Args('ruc', { nullable: true }) ruc?: string,
+      @Args('comprobante', {nullable: true }) comprobante?: string,
+      @Args('proyecto', { nullable: true }) proyecto?: string,
     ): Promise<number> {
-      return this.compraService.obtenerMontoCompras({ desde, hasta, ruc });
+      return this.compraService.obtenerMontoCompras({ desde, hasta, ruc, comprobante, proyecto });
     }
 
     @Query(() => Int)

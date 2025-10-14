@@ -36,11 +36,11 @@ export class ActividadService {
             }
         });
         return actividades.map((a) => ({
+            idActividad: a.idActividad,
             codProyecto: a.codProyecto,
             dniPersonal: a.dniPersonal,
-            encargado: a.personal?.nombre,
+            encargado: a.personal?.nombre +" "+a.personal?.apellido,
             tipoActividad: a.tipoActividad,
-            descripcion: a.descripcion,
             estado: a.estado,
             duracionEstimada: a.duracionEstimada,
             duracionReal: a.duracionReal ?? 0,
@@ -96,66 +96,81 @@ export class ActividadService {
         });
     }
 
-    async crearActividad(
-        input: CrearActividadInput,
-    ): Promise<void> {
-        const {
-            idActividad,
-            codProyecto,
-            dniPersonal,
-            tipoActividad,
-            descripcion,
-            estado,
-            duracionEstimada,
-            duracionReal = 0,
-        } = input;
+    async obtenerEstados(): Promise<string[]> {
+      const actividades = await this.prisma.actividad.findMany({
+          select: { estado: true },
+          distinct: ['estado'],
+      });
+      return actividades.map((p) => p.estado);
+  }
 
-        const proyectoExistente = await this.prisma.proyecto.findFirst({
-            where: { codProyecto },
-        });
-        if (!proyectoExistente) {
-            throw new HttpException(
-                'El proyecto no existe en la base de datos',
-                HttpStatus.CONFLICT,
-            );
-        }
-        const personalExistente = await this.prisma.personal.findFirst({
-            where: { dniPersonal },
-            include: { cargo: true },
-        });
-
-        if (!personalExistente) {
-             throw new HttpException(
-                'El personal no existe en la base de datos',
-                HttpStatus.CONFLICT,
-             );
-        }
-        if (!personalExistente.idCargo || !personalExistente.cargo) {
-            throw new HttpException(
-                'El personal no tiene un cargo asignado',
-                HttpStatus.CONFLICT,
-            );
-        }
-        try {
-            await this.prisma.actividad.create({
-                data: {
-                    idActividad,
-                    codProyecto,
-                    dniPersonal,
-                    tipoActividad,
-                    descripcion,
-                    estado,
-                    duracionEstimada,
-                    duracionReal,
-                }
-            })
-        } catch (error) {
-            throw new HttpException(
-                `Error al crear la actividad ${error}`,
-                HttpStatus.INTERNAL_SERVER_ERROR,
-            );
-        }
+  async crearActividad(input: CrearActividadInput): Promise<void> {
+    const {
+      codProyecto,
+      dniPersonal,
+      tipoActividad,
+      estado,
+      duracionEstimada,
+      duracionReal,
+    } = input;
+  
+    const proyectoExistente = await this.prisma.proyecto.findFirst({
+      where: { codProyecto },
+    });
+    if (!proyectoExistente) {
+      throw new HttpException(
+        'El proyecto no existe en la base de datos',
+        HttpStatus.CONFLICT,
+      );
     }
+  
+    const personalExistente = await this.prisma.personal.findFirst({
+      where: { dniPersonal },
+      include: { cargo: true },
+    });
+  
+    if (!personalExistente) {
+      throw new HttpException(
+        'El personal no existe en la base de datos',
+        HttpStatus.CONFLICT,
+      );
+    }
+    if (!personalExistente.idCargo || !personalExistente.cargo) {
+      throw new HttpException(
+        'El personal no tiene un cargo asignado',
+        HttpStatus.CONFLICT,
+      );
+    }
+  
+    try {
+      // Buscar el último idActividad
+      const ultimaActividad = await this.prisma.actividad.findFirst({
+        orderBy: { idActividad: 'desc' },
+        select: { idActividad: true },
+      });
+  
+      const nuevoId = (ultimaActividad?.idActividad || 0) + 1;
+  
+      await this.prisma.actividad.create({
+        data: {
+          idActividad: nuevoId,
+          codProyecto,
+          dniPersonal,
+          tipoActividad,
+          estado,
+          duracionEstimada,
+          duracionReal: duracionReal ?? null,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        `Error al crear la actividad: ${error}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+  
+      
 
     async actualizarActividad(
         idActividad: number,
@@ -226,7 +241,6 @@ export class ActividadService {
           dniPersonal: updateActividad.dniPersonal,
           encargado: `${updateActividad.personal?.nombre ?? ''} ${updateActividad.personal?.apellido ?? ''}`,
           tipoActividad: updateActividad.tipoActividad,
-          descripcion: updateActividad.descripcion,
           estado: updateActividad.estado,
           duracionEstimada: updateActividad.duracionEstimada,
           duracionReal: updateActividad.duracionReal || 0,

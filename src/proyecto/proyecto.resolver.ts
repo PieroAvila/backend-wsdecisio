@@ -44,6 +44,16 @@ export class ProyectoResolver {
         return this.proyectoService.obtenerClientesDisponibles();
     }
 
+    @Query(() => [String])
+    async obtenerEstados() {
+        return this.proyectoService.obtenerEstados();
+    }
+
+    @Query(() => [String])
+    async obtenerProyectoString() {
+        return this.proyectoService.obtenerProyectosString();
+    }
+
     @Query(() => Float)
     async obtenerPromedioProyectosPorCliente(): Promise<number> {
         return this.proyectoService.obtenerPromedioProyectosPorCliente();
